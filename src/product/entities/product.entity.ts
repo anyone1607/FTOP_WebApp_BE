@@ -18,5 +18,9 @@ export class Product {
   status: boolean;
 
   @Column({ nullable: false })
+  productImage: string;
+
+  @Column({ nullable: false })
   storeId: number;
+
 }

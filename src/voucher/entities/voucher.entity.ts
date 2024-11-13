@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { Store } from '../../store/entities/store.entity'
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Store } from '../../store/entities/store.entity';
+import { Order } from '../../order/entities/order.entity';
 @Entity()
 export class Voucher {
   @PrimaryGeneratedColumn()
@@ -19,4 +20,14 @@ export class Voucher {
 
   @Column({ nullable: false })
   createdDate: Date;
+
+  @Column({ default: false })
+  isDeleted: boolean;
+
+  @Column({ type: 'timestamp', nullable: true })
+  deletedAt: Date;
+
+  @OneToMany(() => Order, order => order.voucher)
+  order: Order[];
+  
 }

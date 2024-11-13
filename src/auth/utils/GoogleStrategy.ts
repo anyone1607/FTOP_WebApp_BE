@@ -24,9 +24,10 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
         const user = await this.authService.validateUser({ 
             email: profile.emails[0].value, 
             displayName: profile.displayName,
-            role: 'Store Owner',
+            avatar: profile.photos[0].value,
+            role: 'store owner',
             password: '123456789',
-            walletBalance: 10000,
+            walletBalance: 0,
             isActive: true
         })
         console.log('Validate')

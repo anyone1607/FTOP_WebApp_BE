@@ -10,12 +10,12 @@ export class AuthService {
     constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {}
 
     async validateUser(details: UserDetails) {
-        console.log("AuthService");
-        console.log(details);
+        // console.log("AuthService");
+        // console.log(details);
         const user = await this.userRepository.findOneBy({ email: details.email });
-        console.log(user);
+        // console.log(user);
         if(user) return user;
-        console.log("User not found");
+        // console.log("User not found");
         const newUser = this.userRepository.create(details);
         return this.userRepository.save(newUser);
     }

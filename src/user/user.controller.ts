@@ -1,12 +1,25 @@
-import { Controller, Get } from '@nestjs/common';
-
+import { Controller, Get, Param } from '@nestjs/common';
+import { UserService } from './user.service';
+import { User } from './entities/user.entity';
 @Controller('user')
 export class UserController {
-    @Get()
-    getAllUsers() {
-    return [
-      { id: 1, name: 'User 1' },
-      { id: 2, name: 'User 2' },
-    ];
+
+  constructor(private readonly usersService: UserService) {}
+
+  @Get('countUser')
+  async getTotalUsers(): Promise<{ totalUsers: number }> {
+    const totalUsers = await this.usersService.countTotalUsers();
+    return { totalUsers };
   }
+
+  @Get('findUser/:id')
+  async findUser(@Param('id') id: number): Promise<User> {
+    return await this.usersService.findUser(id);
+  }
+
+  @Get('findUser')
+  async findUsers(): Promise<User[]> {
+    return await this.usersService.findAllUsers();
+  }
+
 }

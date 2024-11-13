@@ -1,5 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { User } from '../../user/entities/user.entity';
 @Entity()
 export class BankTransfer {
   @PrimaryGeneratedColumn()
@@ -7,6 +7,10 @@ export class BankTransfer {
 
   @Column({ nullable: false })
   walletUserId: number;
+
+  @ManyToOne(() => User, user => user.bankTransfers)
+  @JoinColumn({ name: 'walletUserId' })  
+  user: User;
 
   @Column({ nullable: false })
   accountNumber: number;
@@ -28,4 +32,5 @@ export class BankTransfer {
 
   @Column({ nullable: false })
   status: boolean;
+  
 }

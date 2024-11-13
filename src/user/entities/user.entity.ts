@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Order } from '../../order/entities/order.entity';
+import { BankTransfer } from '../../banktransfer/entities/banktransfer.entity';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -10,6 +11,9 @@ export class User {
 
   @Column()
   displayName: string;
+
+  @Column()
+  avatar: string;
   
   @Column()
   role: string;
@@ -22,5 +26,11 @@ export class User {
 
   @Column()
   isActive: boolean;
+
+  @OneToMany(() => Order, order => order.user)
+  order: Order[]
+
+  @OneToMany(() => BankTransfer, bankTransfer => bankTransfer.user)
+  bankTransfers: BankTransfer[];
 
 }

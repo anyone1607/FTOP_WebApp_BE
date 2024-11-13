@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { Voucher } from '../../voucher/entities/voucher.entity'
+import { Voucher } from '../../voucher/entities/voucher.entity';
+import { Order } from '../../order/entities/order.entity';
 @Entity()
 export class Store {
   @PrimaryGeneratedColumn()
@@ -22,4 +23,8 @@ export class Store {
 
   @OneToMany(() => Voucher, voucher => voucher.store)
   vouchers: Voucher[];
+
+  @OneToMany(() => Order, order => order.store)
+  order: Order[];
+  
 }
