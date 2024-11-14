@@ -1,14 +1,14 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Param,
   Body,
-  Patch,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
+  Put
 } from '@nestjs/common';
-import { StoreService } from './store.service';
 import { Store } from './entities/store.entity';
+import { StoreService } from './store.service';
 @Controller('store')
 export class StoreController {
   constructor(private readonly storeService: StoreService) {}
@@ -28,7 +28,7 @@ export class StoreController {
     return this.storeService.findOne(id);
   }
   //update a store by id
-  @Patch(':id')
+  @Put('/:id')
   update(
     @Param('id') id: number,
     @Body() storeData: Partial<Store>,

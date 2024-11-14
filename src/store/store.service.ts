@@ -31,15 +31,20 @@ export class StoreService {
   }
   // update a store by ID
   async update(id: number, storeData: Partial<Store>): Promise<Store> {
-    const store = await this.storeRepository.preload({
-      storeId: id,
-      ...storeData,
-    });
+    // Load the entity by `id`
+    const store = await this.storeRepository.findOne({ where: { storeId: id } });
+  
     if (!store) {
       throw new NotFoundException(`Store with ID ${id} not found`);
     }
+  
+    // Merge the new data
+    Object.assign(store, storeData);
+  
+    // Save the updated entity
     return this.storeRepository.save(store);
   }
+  
   // delete a store by id
   async remove(id: number): Promise<void> {
     const store = await this.storeRepository.findOneBy({ storeId: id });
