@@ -19,4 +19,5 @@ export class OrderItem {
 
   @Column()
   voucherId: number;
+  
 }

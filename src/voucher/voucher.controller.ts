@@ -12,21 +12,28 @@ import { Voucher } from './entities/voucher.entity';
 @Controller('voucher')
 export class VoucherController {
   constructor(private readonly voucherService: VoucherService) {}
+  
+  @Get()
+  async findAll(): Promise<Voucher[]> {
+    return this.voucherService.findAll();
+  }
+  // tim delete da bi xoa mem
+  @Get('deleted')
+  async getDeletedVouchers(): Promise<Voucher[]> {
+    return this.voucherService.getDeletedVouchers();
+  }
+  
 
   @Post()
   create(@Body() voucherData: Partial<Voucher>) {
     return this.voucherService.create(voucherData);
   }
 
-  // @Get()
-  // findAll(): Promise<Voucher[]> {
-  //     return this.voucherService.findAll();
-  // }
-
   @Get(':id')
   findOne(@Param('id') id: number): Promise<Voucher> {
     return this.voucherService.findOne(id);
   }
+  
 
   @Patch(':id')
   update(
@@ -36,33 +43,24 @@ export class VoucherController {
     return this.voucherService.update(id, voucherData);
   }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: number): Promise<void> {
-  //     return this.voucherService.remove(id);
-  // }
-
-  @Delete(':id')
-  softDelete(@Param('id') id: number): Promise<void> {
+  @Patch(':id/delete')
+  async softDelete(@Param('id') id: number): Promise<void> {
     return this.voucherService.softDelete(id);
   }
 
-  @Get('trash')
-  getDeletedVouchers() {
-    return this.voucherService.getDeletedVoucher();
-  }
-
-  @Get('restore/:id')
-  restore(@Param('id') id: number): Promise<void> {
+  // khoi phuc lai voucher da bi xoa mem
+  @Patch(':id/restore')
+  async restore(@Param('id') id: number): Promise<void> {
     return this.voucherService.restore(id);
   }
 
-  @Delete('permanently/:id')
-  permanentlyDelete(@Param('id') id: number): Promise<void> {
+  // xoa that sự
+
+  @Delete(':id')
+  async permanentlyDelete(@Param('id') id: number): Promise<void> {
     return this.voucherService.permanentlyDelete(id);
   }
 
-  @Get()
-  findAll(): Promise<Voucher[]> {
-    return this.voucherService.findAll();
-  }
+  
+
 }

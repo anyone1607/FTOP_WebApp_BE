@@ -6,6 +6,7 @@ import {
   Body,
   Patch,
   Delete,
+  Query
 } from '@nestjs/common';
 import { StoreService } from './store.service';
 import { Store } from './entities/store.entity';
@@ -16,6 +17,17 @@ export class StoreController {
   @Post()
   create(@Body() storeData: Partial<Store>): Promise<Store> {
     return this.storeService.create(storeData);
+  }
+  
+  @Get('order-count')
+  async getOrderCountByStore(
+    @Query('filterType') filterType?: 'day' | 'month' | 'year',
+    @Query('filterValue') filterValue?: string,
+  ) {
+    return await this.storeService.getOrderCountByStore(
+      filterType,
+      filterValue,
+    );
   }
   // get all stores
   @Get()
@@ -40,4 +52,5 @@ export class StoreController {
   remove(@Param('id') id: number): Promise<void> {
     return this.storeService.remove(id);
   }
+
 }

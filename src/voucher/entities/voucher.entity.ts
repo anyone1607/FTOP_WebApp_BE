@@ -21,6 +21,8 @@ export class Voucher {
   @Column({ nullable: false })
   createdDate: Date;
 
+  // them 2 cot nay vao
+
   @Column({ default: false })
   isDeleted: boolean;
 

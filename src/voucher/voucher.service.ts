@@ -20,10 +20,6 @@ export class VoucherService {
     return this.voucherRepository.save(newVoucher);
   }
 
-  // async findAll(): Promise<Voucher[]> {
-  //   return await this.voucherRepository.find({ relations: ['store'] });
-  // }
-
   async create(voucherData: Partial<Voucher>): Promise<Voucher> {
     const voucher = this.voucherRepository.create(voucherData);
     return await this.voucherRepository.save(voucher);
@@ -51,46 +47,46 @@ export class VoucherService {
     return this.voucherRepository.save(voucher);
   }
 
-  // async remove(id: number): Promise<void> {
-  //   const voucher = await this.voucherRepository.findOneBy({ voucherId: id });
-  //   if (!voucher) {
-  //     throw new NotFoundException(`Voucher with ID ${id} not found`);
-  //   }
-  //   await this.voucherRepository.remove(voucher);
-  // }
-
   // soft delete voucher (done)
   async softDelete(id: number): Promise<void> {
-    const voucher = await this.voucherRepository.findOneBy({ voucherId: id });
+    const voucher = await this.voucherRepository.findOne({ where: { voucherId: id }, relations: ['store'] });
     if (voucher) {
       voucher.isDeleted = true;
       voucher.deletedAt = new Date();
       await this.voucherRepository.save(voucher);
     }
   }
+  
 
   // list deleted voucher in trash
-  async getDeletedVoucher() {
+  async getDeletedVouchers(): Promise<Voucher[]> {
     return await this.voucherRepository.find({
-      where: {
-        isDeleted: true
-      },
-      relations: ['store']
+      where: { isDeleted: true },
+      relations: ['store'],
     });
   }
 
   // restore deleted voucher
   async restore(id: number): Promise<void> {
-    const voucher = await this.voucherRepository.findOne({ where: { voucherId: id } });
-    if (voucher && voucher.isDeleted) {
-      voucher.isDeleted = false;
-      voucher.deletedAt = null;
-      await this.voucherRepository.save(voucher);
+    const voucher = await this.voucherRepository.findOne({
+      where: { voucherId: id, isDeleted: true },
+    });
+    if (!voucher) {
+      throw new NotFoundException(`Voucher with ID ${id} not found or not deleted`);
     }
+    voucher.isDeleted = false;
+    voucher.deletedAt = null;
+    await this.voucherRepository.save(voucher);
   }
 
   // permanently delete
   async permanentlyDelete(id: number): Promise<void> {
+    const voucher = await this.voucherRepository.findOne({
+      where: { voucherId: id, isDeleted: true },
+    });
+    if (!voucher) {
+      throw new NotFoundException(`Voucher with ID ${id} not found or not marked for deletion`);
+    }
     await this.voucherRepository.delete(id);
   }
 
@@ -98,5 +94,4 @@ export class VoucherService {
   async findAll(): Promise<Voucher[]> {
     return this.voucherRepository.find({ where: { isDeleted: false } });
   }
-
 }

@@ -27,6 +27,7 @@ export class OrderService {
 
   async findAll(): Promise<Order[]> {
     return await this.orderRepository.find({
+      where: { isDeleted: false },
       relations: ['user', 'store', 'voucher'],
     });
   }
@@ -47,5 +48,54 @@ export class OrderService {
       where: { store: { storeId: storeId } },
     });
   }
+
+  async softDelete(orderId: number): Promise<string> {
+    const order = await this.orderRepository.findOne({ where: { orderId } });
+
+    if (!order) {
+      throw new Error(`Order with ID ${orderId} not found`);
+    }
+
+    if (order.isDeleted) {
+      throw new Error(`Order with ID ${orderId} is already deleted`);
+    }
+
+    order.isDeleted = true;
+    await this.orderRepository.save(order);
+
+    return `Order with ID ${orderId} has been soft deleted`;
+  }
+
+  async findDeleted(): Promise<Order[]> {
+    return await this.orderRepository.find({
+      where: { isDeleted: true },
+      relations: ['user', 'store', 'voucher'],
+    });
+  }
+
+  // api so luong don hang ban duoc cua tung store theo ngay thang nam
+  // async getOrderCountByStore(filterType: 'day' | 'month' | 'year', filterValue: string): Promise<any> {
+  //   const queryBuilder = this.orderRepository
+  //   .createQueryBuilder('order')
+  //   .select('store.storeId', 'storeId')
+  //   .addSelect('store.storeName', 'storeName')
+  //   .addSelect('COUNT(order.orderId)', 'orderCount')
+  //   .innerJoin('order.store', 'store')
+  //   .groupBy('store.storeId')
+  //   .addGroupBy('store.storeName');
+  //   console.log(queryBuilder);
+
+  //   if(filterType === 'day') {
+  //     queryBuilder.where('DATE(order.orderDate) = :filterValue', {filterValue});
+  //   }else if(filterType === 'month'){
+  //     queryBuilder.where('MONTH(order.orderDate) = :month AND YEAR(order.orderDate) = :year', {
+  //       month: filterValue.split('-')[1],
+  //       year: filterValue.split('-')[0],
+  //     });
+  //   }else if(filterType === 'year') {
+  //     queryBuilder.where('YEAR(order.orderDate) = :filterValue', { filterValue });
+  //   }
+  //   return await queryBuilder.getRawMany();
+  // }
   
 }
