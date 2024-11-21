@@ -5,7 +5,7 @@ export const dataSourceOptions: DataSourceOptions = {
   host: 'localhost',
   port: 33061,
   username: 'root',
-  password: 'SEP490_FTOP',
+  password: 'tung2003hl',
   database: 'SEP490_FTOP',
   entities: ['dist/**/*.entity.js'],
   migrations: ['dist/db/migrations/*.js'],
