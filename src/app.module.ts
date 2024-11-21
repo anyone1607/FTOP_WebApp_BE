@@ -11,7 +11,6 @@ import { BanktransferModule } from './banktransfer/banktransfer.module';
 // import { CategoryController } from './category/category.controller';
 import { CategoryModule } from './category/category.module';
 import { OrderModule } from './order/order.module';
-import { OrderItemController } from './order-item/order-item.controller';
 import { OrderItemModule } from './order-item/order-item.module';
 import { ProductModule } from './product/product.module';
 import { ReviewController } from './review/review.controller';
@@ -39,7 +38,6 @@ import { VoucherModule } from './voucher/voucher.module';
   controllers: [
     AppController,
     AuthController,
-    OrderItemController,
     ReviewController,
   ],
   providers: [AppService],

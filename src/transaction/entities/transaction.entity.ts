@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {Order} from "../../order/entities/order.entity";
+import { User } from "../../user/entities/user.entity";
 @Entity()
 export class Transaction {
   @PrimaryGeneratedColumn()
@@ -23,6 +24,16 @@ export class Transaction {
   @Column({ nullable: false })
   status: boolean;
 
-  @Column({ nullable: false })
-  orderId: number;
+  @ManyToOne(() => Order, order => order.orderId)
+  @JoinColumn({ name: 'orderId' })
+  order: Order;
+
+  @ManyToOne(() => User, user => user.id)
+  @JoinColumn({ name: 'transferUserId' })
+  transferUser: User;
+
+  @ManyToOne(() => User, user => user.id)
+  @JoinColumn({ name: 'receiveUserId' })
+  receiveUser: User;
+
 }

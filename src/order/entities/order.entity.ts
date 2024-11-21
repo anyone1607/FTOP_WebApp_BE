@@ -31,5 +31,8 @@ export class Order {
 
   @Column('decimal', { precision: 10, scale: 2, nullable: false })
   totalPrice: number;
+
+  @Column({ default: false })
+  isDeleted: boolean;
   
 }
