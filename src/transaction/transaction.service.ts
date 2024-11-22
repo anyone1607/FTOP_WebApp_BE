@@ -1,13 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { Transaction } from './entities/transaction.entity';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class TransactionService {
   constructor(
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async countTotalTransactions(): Promise<number> {
@@ -80,6 +83,54 @@ export class TransactionService {
     }
 
     return result;
+  }
+
+
+  // api chuyen tien giua cac user voi nhau (android)
+  async transferMoney(transferUserId: number, receiveUserId: number, amount: number, description: string): Promise<Transaction> {
+    const transferUser = await this.userRepository.findOne({ where: { id: transferUserId } });
+    const receiveUser = await this.userRepository.findOne({ where: { id: receiveUserId } });
+
+    if(!transferUser) throw new NotFoundException('Transfer user not found');
+    if(!receiveUser) throw new NotFoundException('Receive user not found');
+
+    if (transferUser.walletBalance - amount < 0) {
+      throw new BadRequestException('Balance cannot be negative after transaction');
+    }
+
+    if (transferUser.walletBalance < amount) {
+      throw new BadRequestException({
+        message: 'Insufficient balance',
+        currentBalance: transferUser.walletBalance,
+        requiredAmount: amount,
+      });
+    }
+
+    transferUser.walletBalance -= amount;
+    receiveUser.walletBalance += amount;
+
+    console.log('Transfer User Balance:', transferUser.walletBalance);
+    console.log('Receive User Balance:', receiveUser.walletBalance);
+
+
+    await this.userRepository.save(transferUser);
+    await this.userRepository.save(receiveUser);
+
+    const updatedTransferUser = await this.userRepository.findOne({ where: { id: transferUserId } });
+    const updatedReceiveUser = await this.userRepository.findOne({ where: { id: receiveUserId } });
+
+    console.log('Updated Transfer User:', updatedTransferUser.walletBalance);
+    console.log('Updated Receive User:', updatedReceiveUser.walletBalance);
+
+    const transaction = this.transactionRepository.create({
+      transferUserId,
+      receiveUserId,
+      transactionAmount: amount,
+      transactionDate: new Date(),
+      transactionDescription: description,
+      status: true,
+    })
+    return this.transactionRepository.save(transaction);
   }
 
 }

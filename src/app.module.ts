@@ -17,6 +17,7 @@ import { ReviewModule } from './review/review.module';
 import { StoreModule } from './store/store.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { VoucherModule } from './voucher/voucher.module';
+import { ZalopayModule } from './zalopay/zalopay.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { VoucherModule } from './voucher/voucher.module';
     StoreModule,
     TransactionModule,
     VoucherModule,
+    ZalopayModule,
   ],
   controllers: [
     AppController,
