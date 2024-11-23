@@ -28,12 +28,28 @@ export class TransactionService {
     });
   }
 
+  // list transaction userby receiveUserid
   async findTransactionsByReceiveUserId(
     receiveUserId: number,
   ): Promise<Transaction[]> {
     return this.transactionRepository.find({
       where: {
         receiveUserId,
+        status: true,
+        order: { orderStatus: true },
+      },
+      relations: ['order', 'receiveUser', 'transferUser'],
+    });
+  }
+
+
+  // list transaction userby transferUserid (android)
+  async findTransactionsByTransferUserId(
+    transferUserId: number,
+  ): Promise<Transaction[]> {
+    return this.transactionRepository.find({
+      where: {
+        transferUserId,
         status: true,
         order: { orderStatus: true },
       },
@@ -94,9 +110,9 @@ export class TransactionService {
     if(!transferUser) throw new NotFoundException('Transfer user not found');
     if(!receiveUser) throw new NotFoundException('Receive user not found');
 
-    if (transferUser.walletBalance - amount < 0) {
-      throw new BadRequestException('Balance cannot be negative after transaction');
-    }
+    // if (transferUser.walletBalance - amount < 0) {
+    //   throw new BadRequestException('Balance cannot be negative after transaction');
+    // }
 
     if (transferUser.walletBalance < amount) {
       throw new BadRequestException({
@@ -132,5 +148,7 @@ export class TransactionService {
     })
     return this.transactionRepository.save(transaction);
   }
+
+  // 
 
 }

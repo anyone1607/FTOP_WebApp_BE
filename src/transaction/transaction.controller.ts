@@ -12,6 +12,7 @@ export class TransactionController {
     return { totalTransactions };
   }
 
+  
   @Get('revenue-by-order')
   async getRevenueByOrder() {
     return await this.transactionService.getRevenueByOrder();
@@ -23,6 +24,16 @@ export class TransactionController {
   ): Promise<Transaction[]> {
     return this.transactionService.findTransactionsByReceiveUserId(
       receiveUserId,
+    );
+  }
+
+  // http://localhost:8000/api/transaction/transfer/26
+  @Get('transfer/:transferUserId')
+  async findByTransferUserIdWithConditions(
+    @Param('transferUserId', ParseIntPipe) transferUserId: number,
+  ): Promise<Transaction[]> {
+    return this.transactionService.findTransactionsByTransferUserId(
+      transferUserId,
     );
   }
 
