@@ -55,4 +55,13 @@ export class ProductService {
       const result = await this.productRepository.delete(id);
       return result.affected > 0;
     }
+
+    async softDelete(id: number): Promise<void> {
+      const product = await this.productRepository.findOne({ where: { productId: id }, relations: ['store'] });
+      if (product) {
+        product.isDeleted = true;
+        product.deletedAt = new Date();
+        await this.productRepository.save(product);
+      }
+    }
 }
