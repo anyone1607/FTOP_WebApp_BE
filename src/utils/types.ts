@@ -27,3 +27,4 @@ export type VoucherDetails = {
     isDeleted: boolean;
     deletedAt: Date;
 }
+

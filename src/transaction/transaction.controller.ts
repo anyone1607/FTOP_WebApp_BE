@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
 import { Transaction } from './entities/transaction.entity';
 @Controller('transaction')
@@ -12,6 +12,7 @@ export class TransactionController {
     return { totalTransactions };
   }
 
+  
   @Get('revenue-by-order')
   async getRevenueByOrder() {
     return await this.transactionService.getRevenueByOrder();
@@ -25,4 +26,26 @@ export class TransactionController {
       receiveUserId,
     );
   }
+
+  // http://localhost:8000/api/transaction/transfer/26
+  @Get('transfer/:transferUserId')
+  async findByTransferUserIdWithConditions(
+    @Param('transferUserId', ParseIntPipe) transferUserId: number,
+  ): Promise<Transaction[]> {
+    return this.transactionService.findTransactionsByTransferUserId(
+      transferUserId,
+    );
+  }
+
+  @Post('transfer')
+  async transferMoney(@Body() body: any) {
+    const { transferUserId, receiveUserId, amount, description } = body;
+
+    if (!transferUserId || !receiveUserId || !amount || amount <= 0) {
+      throw new BadRequestException('Invalid transfer details');
+    }
+
+    return this.transactionService.transferMoney(transferUserId, receiveUserId, amount, description);
+  }
+
 }
