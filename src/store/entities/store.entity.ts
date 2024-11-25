@@ -1,6 +1,15 @@
-import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Voucher } from '../../voucher/entities/voucher.entity';
 import { Order } from '../../order/entities/order.entity';
+import { User } from '../../user/entities/user.entity';
+
 @Entity()
 export class Store {
   @PrimaryGeneratedColumn()
@@ -15,16 +24,25 @@ export class Store {
   @Column()
   storePhone: number;
 
-  @Column({ nullable: false })
-  ownerId: number;
+  // join userId table user
+  // @Column()
+  // ownerId: number;
+
+  @OneToOne(() => User, user => user.store)
+  @JoinColumn({ name: 'ownerId' })
+  user: User;
 
   @Column({ nullable: false })
   status: boolean;
 
-  @OneToMany(() => Voucher, voucher => voucher.store)
+  // filed array storeImage
+  @Column('json', { nullable: true })
+  storeImage: string[];
+
+  @OneToMany(() => Voucher, (voucher) => voucher.store)
   vouchers: Voucher[];
 
-  @OneToMany(() => Order, order => order.store)
+  @OneToMany(() => Order, (order) => order.store)
   order: Order[];
   
 }

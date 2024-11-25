@@ -2,6 +2,7 @@ export type UserDetails = {
     email: string;
     displayName: string;
     avatar: string;
+    phoneNumber: string;
     role: string;
     password: string;
     walletBalance: number;

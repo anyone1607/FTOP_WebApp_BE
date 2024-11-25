@@ -1,7 +1,8 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn,OneToMany } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Store } from '../../store/entities/store.entity';
 import { Voucher } from '../../voucher/entities/voucher.entity';
+import { OrderItem } from 'src/order-item/entities/orderItem.entity';
 
 @Entity()
 export class Order {
@@ -22,17 +23,19 @@ export class Order {
   @Column({ nullable: false })
   orderDate: Date;
 
-  @ManyToOne(() => Voucher, voucher => voucher.order)
+  @ManyToOne(() => Voucher, voucher => voucher.order, { nullable: true })
   @JoinColumn({ name: 'voucherId' })
   voucher: Voucher;
 
   @Column({ length: 50 })
   note: string;
 
-  @Column('decimal', { precision: 10, scale: 2, nullable: false })
+  @Column({ nullable: false })
   totalPrice: number;
 
   @Column({ default: false })
   isDeleted: boolean;
   
+  @OneToMany(() => OrderItem, orderItem => orderItem.order) // Thêm quan hệ OneToMany
+  orderItems: OrderItem[];
 }

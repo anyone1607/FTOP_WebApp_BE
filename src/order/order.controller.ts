@@ -1,4 +1,4 @@
-import { Controller, Get, Delete, Param } from '@nestjs/common';
+import { Controller, Get, Delete, Param,Post,Body } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { Order } from './entities/order.entity';
 @Controller('order')
@@ -15,6 +15,17 @@ export class OrderController {
   async countTotalPriceOrder(): Promise<{ totalPrice: number }> {
     const totalPrice = await this.orderService.countTotalPriceOrder();
     return { totalPrice };
+  }
+
+  @Post('create')
+  async createOrder(
+    @Body('userId') userId: number,
+    @Body('storeId') storeId: number,
+    @Body('voucherId') voucherId: number | null,
+    @Body('note') note: string,
+    @Body('totalPrice') totalPrice: number,
+  ): Promise<Order> {
+    return this.orderService.createOrder(userId, storeId, voucherId, note, totalPrice);
   }
   
   @Get()
@@ -54,4 +65,6 @@ export class OrderController {
   //     filterValue,
   //   );
   // }
+
+  
 }

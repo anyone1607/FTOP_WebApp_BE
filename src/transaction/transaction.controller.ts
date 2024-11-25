@@ -37,6 +37,13 @@ export class TransactionController {
     );
   }
 
+  @Get('all-transactions/:userId')
+async findAllTransactionsForUser(
+  @Param('userId', ParseIntPipe) userId: number,
+): Promise<Transaction[]> {
+  return this.transactionService.findAllTransactionsForUser(userId);
+}
+
   @Post('transfer')
   async transferMoney(@Body() body: any) {
     const { transferUserId, receiveUserId, amount, description } = body;
@@ -46,6 +53,23 @@ export class TransactionController {
     }
 
     return this.transactionService.transferMoney(transferUserId, receiveUserId, amount, description);
+  }
+
+  //api cho chức năng chuyển tiền order android
+@Post('place-order-transaction')
+async placeOrderWithTransaction(@Body() body: any): Promise<any> {
+  const { userId, storeId, voucherId, products, note, totalPrice } = body;
+
+  if (!userId || !storeId || !products || !totalPrice || totalPrice <= 0) {
+    throw new BadRequestException('Invalid order details');
+  }
+
+  return this.transactionService.placeOrderWithTransaction(userId, storeId, voucherId, products, note, totalPrice);
+}
+
+@Get('summary/:userId')
+  async getTransactionSummary(@Param('userId') userId: number) {
+    return this.transactionService.getTransactionSummary(userId);
   }
 
 }

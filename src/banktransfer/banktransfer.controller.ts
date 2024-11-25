@@ -1,5 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { BanktransferService } from './banktransfer.service';
+
 @Controller('banktransfer')
 export class BanktransferController {
   constructor(private readonly bankTransferService: BanktransferService) {}

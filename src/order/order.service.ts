@@ -2,6 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Order } from './entities/order.entity';
+import { User } from '../user/entities/user.entity';
+import { Store } from '../store/entities/store.entity';
+import { Voucher } from '../voucher/entities/voucher.entity';
 
 @Injectable()
 export class OrderService {
@@ -23,6 +26,27 @@ export class OrderService {
       .getRawOne();
   
     return parseFloat(result.totalPrice || '0');
+  }
+
+  async getStoreStats(storeId: number, month: number | null, year: number): Promise<{ totalOrders: number; totalRevenue: number }> {
+    const queryBuilder = this.orderRepository.createQueryBuilder('order')
+      .select('COUNT(order.orderId)', 'totalOrders')
+      .addSelect('SUM(order.totalPrice)', 'totalRevenue')
+      .where('order.storeId = :storeId', { storeId })
+      .andWhere('YEAR(order.orderDate) = :year', { year })
+      .andWhere('order.orderStatus = :orderStatus', { orderStatus: true });
+
+    if (month !== null) {
+      queryBuilder.andWhere('MONTH(order.orderDate) = :month', { month });
+    } else {
+      queryBuilder.andWhere(':month IS NULL');
+    }
+
+    const result = await queryBuilder.getRawOne();
+    return {
+      totalOrders: parseInt(result.totalOrders, 10) || 0,
+      totalRevenue: parseFloat(result.totalRevenue) || 0,
+    };
   }
 
   async findAll(): Promise<Order[]> {
@@ -97,5 +121,44 @@ export class OrderService {
   //   }
   //   return await queryBuilder.getRawMany();
   // }
+
+  async createOrder(
+    userId: number,
+    storeId: number,
+    voucherId: number | null,
+    note: string,
+    totalPrice: number,
+  ): Promise<Order> {
+    const user = await this.orderRepository.manager.findOne(User, { where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    const store = await this.orderRepository.manager.findOne(Store, { where: { storeId: storeId } });
+    if (!store) {
+      throw new NotFoundException(`Store with ID ${storeId} not found`);
+    }
+
+    let voucher = null;
+    if (voucherId !== null) {
+      voucher = await this.orderRepository.manager.findOne(Voucher, { where: { voucherId: voucherId } });
+      if (!voucher) {
+        throw new NotFoundException(`Voucher with ID ${voucherId} not found`);
+      }
+    }
+
+    const order = this.orderRepository.create({
+      user,
+      store,
+      voucher,
+      orderStatus: true,
+      orderDate: new Date(),
+      note,
+      totalPrice,
+      isDeleted: false,
+    });
+
+    return await this.orderRepository.save(order);
+  }
   
 }

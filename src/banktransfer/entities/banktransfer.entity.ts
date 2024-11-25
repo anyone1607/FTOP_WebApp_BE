@@ -21,7 +21,7 @@ export class BankTransfer {
   @Column({ nullable: false })
   transferType: boolean;
 
-  @Column('decimal', { precision: 10, scale: 2, nullable: false })
+  @Column({ nullable: false })
   transferAmount: number;
 
   @Column({ length: 100 })

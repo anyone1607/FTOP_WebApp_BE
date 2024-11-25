@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
   Param,
@@ -9,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { VoucherService } from './voucher.service';
 import { Voucher } from './entities/voucher.entity';
+
 @Controller('voucher')
 export class VoucherController {
   constructor(private readonly voucherService: VoucherService) {}
@@ -23,18 +23,11 @@ export class VoucherController {
     return this.voucherService.getDeletedVouchers();
   }
   
-
-  @Post()
-  create(@Body() voucherData: Partial<Voucher>) {
-    return this.voucherService.create(voucherData);
-  }
-
   @Get(':id')
   findOne(@Param('id') id: number): Promise<Voucher> {
     return this.voucherService.findOne(id);
   }
   
-
   @Patch(':id')
   update(
     @Param('id') id: number,
@@ -61,6 +54,10 @@ export class VoucherController {
     return this.voucherService.permanentlyDelete(id);
   }
 
-  
+  // http://localhost:8000/api/voucher/store/{storeId}
+  @Get('store/:storeId')
+  async getVouchersByStoreId(@Param('storeId') storeId: number): Promise<Voucher[]> {
+    return await this.voucherService.findByStoreId(+storeId);
+  }
 
 }

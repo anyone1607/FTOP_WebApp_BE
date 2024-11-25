@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { ZalopayService } from './zalopay.service';
 
 @Controller('zalopay')
@@ -7,7 +7,7 @@ export class ZalopayController {
 
   @Post()
   async createOrder() {
-    return this.zaloPayService.createOrder();
+    return this.zaloPayService.createPayment();
   }
 
   @Post('callback')
