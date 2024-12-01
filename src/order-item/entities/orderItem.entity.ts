@@ -17,7 +17,8 @@ export class OrderItem {
   @Column('decimal', { precision: 10, scale: 2, nullable: false })
   unitPrice: number;
 
-  @Column()
-  voucherId: number;
+  //xóa voucher khỏi order item
+//  @Column()
+//  voucherId: number;
   
 }
