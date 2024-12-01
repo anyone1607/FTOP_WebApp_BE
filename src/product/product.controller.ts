@@ -8,11 +8,11 @@ import {
   Put,
   ValidationPipe,
 } from '@nestjs/common';
-import { ProductService } from './product.service';
-import { ResponseData } from 'src/global/globalClass';
-import { HttpMessage, HttpStatus } from 'src/global/globalEnum';
+import { ProductDto } from '../dto/product.dto';
+import { ResponseData } from '../global/globalClass';
+import { HttpMessage, HttpStatus } from '../global/globalEnum';
 import { Product } from './entities/product.entity';
-import { ProductDto } from 'src/dto/product.dto';
+import { ProductService } from './product.service';
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
