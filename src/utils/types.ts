@@ -6,6 +6,7 @@ export type UserDetails = {
     password: string;
     walletBalance: number;
     isActive: boolean;
+    phoneNumber: string;
 }
 
 export type OrderDetails = {
@@ -26,4 +27,11 @@ export type VoucherDetails = {
     createdDate: Date;
     isDeleted: boolean;
     deletedAt: Date;
+}
+export type CreateUserDto = {
+    email: string;
+    displayName: string;
+    avatar: string;
+    role: string;
+    password: string;
 }

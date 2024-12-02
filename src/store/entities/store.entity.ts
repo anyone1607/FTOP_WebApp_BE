@@ -1,6 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn,ManyToOne } from 'typeorm';
 import { Voucher } from '../../voucher/entities/voucher.entity';
 import { Order } from '../../order/entities/order.entity';
+import { User } from '../../user/entities/user.entity';
 @Entity()
 export class Store {
   @PrimaryGeneratedColumn()
@@ -15,8 +16,14 @@ export class Store {
   @Column()
   storePhone: number;
 
-  @Column({ nullable: false })
-  ownerId: number;
+
+  @Column()
+  ownerId: number;  // Thêm cột 'ownerId' làm khóa ngoại
+
+  @OneToOne(() => User, (user) => user.store)  // Liên kết ngược lại từ Store sang User
+  @JoinColumn({ name: 'ownerId' })  // Chỉ định khóa ngoại là 'ownerId'
+  owner: User;  // Liên kết với User
+
 
   @Column({ nullable: false })
   status: boolean;

@@ -18,8 +18,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(accessToken: string, refreshToken: string, profile: Profile) {
-        console.log(accessToken);
-        console.log(refreshToken);
+        console.log('accessToken:',accessToken);
+        console.log('refreshToken:',refreshToken);
         console.log(profile);
 
         const fixedRoles = {
@@ -38,7 +38,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
             role,
             password: '123456789',
             walletBalance: 0,
-            isActive: true
+            isActive: true,
+            phoneNumber:'0',
         })
         console.log('Validate')
         console.log(user);

@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   ValidationPipe,
+  UseGuards
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ResponseData } from 'src/global/globalClass';
@@ -16,11 +17,12 @@ import { ProductDto } from 'src/dto/product.dto';
 import { UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import * as admin from 'firebase-admin';
 import { extname } from 'path';
-import { Readable } from 'stream';
+import { RolesGuard } from 'src/auth/utils/role.guard';
+import { Roles } from 'src/auth/utils/roles.decorator';
 
-
+@UseGuards(RolesGuard)
+@Roles('admin', 'manager') // Chỉ cho phép admin và manager truy cập
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
@@ -28,9 +30,21 @@ export class ProductController {
   @Get()
   async getProducts(): Promise<ResponseData<Product[]>> {
     try {
+      // Lấy danh sách sản phẩm từ service
       const products = await this.productService.getProducts();
+  
+      // Ánh xạ thêm thông tin categoryName và storeName vào sản phẩm
+      const responseProducts = products.map(product => {
+        return {
+          ...product,
+          categoryName: product.category?.categoryName, // Thêm categoryName
+          storeName: product.store?.storeName, // Thêm storeName
+        };
+      });
+  
+      // Trả về response đã được ánh xạ
       return new ResponseData<Product[]>(
-        products,
+        responseProducts,
         HttpStatus.OK,
         HttpMessage.OK,
       );

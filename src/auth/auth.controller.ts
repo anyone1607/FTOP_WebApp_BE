@@ -1,8 +1,11 @@
-import { Controller, Get, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Res } from '@nestjs/common';
 import { GoogleAuthGuard } from './utils/Guards';
-import { Request } from 'express';
 import { RolesGuard } from './utils/role.guard';
 import { Roles } from './utils/roles.decorator';
+import { JwtService } from '@nestjs/jwt';
+import { Request, Response } from 'express';
+import { UserDetails } from 'src/utils/types';
+
 
 // @Controller('auth')
 // export class AuthController {
@@ -33,6 +36,11 @@ import { Roles } from './utils/roles.decorator';
 
 @Controller('auth')
 export class AuthController {
+  constructor(
+    private readonly jwtService: JwtService
+  ) {}
+
+
   @Get('google/login')
   @UseGuards(GoogleAuthGuard)
   handleLogin() {
@@ -40,10 +48,17 @@ export class AuthController {
   }
 
   @Get('google/redirect')
-  @UseGuards(GoogleAuthGuard)
-  handleRedirect() {
-    return { msg: 'OK' };
-  }
+@UseGuards(GoogleAuthGuard)
+async googleRedirect(@Req() req: Request, @Res() res: Response) {
+  const user = req.user as UserDetails;
+  const payload = { email: user.email, role: user.role };
+  const token = this.jwtService.sign(payload);
+
+  // Chuyển hướng đến frontend với token và thông tin người dùng
+  const redirectUrl = `http://localhost:3000/auth/system/e-wallet?token=${token}&email=${user.email}&role=${user.role}&name=${user.displayName}`;
+  return res.redirect(redirectUrl);
+}
+
 
   @Get('status')
   user(@Req() request: Request) {
@@ -70,4 +85,18 @@ export class AuthController {
   managerEndpoint() {
     return { msg: 'Welcome Manager' };
   }
+
+  // @UseGuards(GoogleAuthGuard)
+  // @Get("google/login")
+  // googleLogin(){
+
+  // }
+
+
+  // @UseGuards(GoogleAuthGuard)
+  // @Get("google/callback")
+  // googleCallback(@Req() req){
+
+
+  // }
 }

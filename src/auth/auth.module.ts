@@ -5,9 +5,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
 import { AuthService } from './auth.service';
 import { SessionSerializer } from './utils/Serializer';
+import { JwtModule,JwtService } from '@nestjs/jwt';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User]),
+  JwtModule.register({
+    secret: 'your-secret-key',  // Cung cấp secret key
+    signOptions: { expiresIn: '60s' },  // Thêm tùy chọn nếu cần
+  }),],
   controllers: [AuthController],
   providers: [
     GoogleStrategy,
@@ -16,6 +21,7 @@ import { SessionSerializer } from './utils/Serializer';
       provide: 'AUTH_SERVICE',
       useClass: AuthService,
     },
+    JwtService,
   ],
 })
 export class AuthModule {}

@@ -13,7 +13,7 @@ export class Product {
   @Column('decimal', { precision: 10, scale: 2, nullable: false })
   productPrice: number;
 
-  @ManyToOne(() => Category)
+  @ManyToOne(() => Category, (category) =>category.categoryId)
   @JoinColumn({ name: 'categoryId' })
   category: Category;
 
@@ -32,10 +32,10 @@ export class Product {
   @Column({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 
-  @ManyToOne(() => Store)  // Many-to-One relationship with Store
+  @ManyToOne(() => Store,(store) =>store.storeId)  // Many-to-One relationship with Store
   @JoinColumn({ name: 'storeId' })  // Đảm bảo storeId là khóa ngoại
   store: Store;
 
   @Column({ nullable: false })
-  storeId: number;  // storeId là khóa ngoại
+  storeId: number;  // storeId là khóa ngoại  
 }

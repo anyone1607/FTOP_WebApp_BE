@@ -11,7 +11,17 @@ export class ProductService {
       private readonly productRepository: Repository<Product>
     ) {}
     async getProducts(): Promise<Product[]> {
-        return await this.productRepository.find();
+      const products = await this.productRepository.find({
+        relations: ['category', 'store'],  // Bao gồm các mối quan hệ với Category và Store
+      });
+    
+      return products.map((product) => {
+        return {
+          ...product,
+          categoryName: product.category?.categoryName, // Lấy tên của category
+          storeName: product.store?.storeName, // Lấy tên của store
+        };
+      });
     }
 
     
@@ -22,7 +32,8 @@ export class ProductService {
 
     
     async detailProduct(id: number): Promise<Product> {
-      return await this.productRepository.findOne({ where: { productId: id } });
+      return await this.productRepository.findOne({ where: { productId: id },
+        relations: ['category', 'store'], });
     }
 
     

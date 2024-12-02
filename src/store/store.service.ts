@@ -16,7 +16,7 @@ export class StoreService {
   }
   // Get all stores
   async findAll(): Promise<Store[]> {
-    return await this.storeRepository.find({ relations: ['vouchers'] });
+    return await this.storeRepository.find({ relations: ['vouchers','owner'] });
   }
   // Get one store by id
   async findOne(id: number): Promise<Store> {

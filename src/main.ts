@@ -29,10 +29,6 @@ async function bootstrap() {
     '/uploads/products',
     express.static(path.join(__dirname, '..', '..', 'uploads/products'))
   );
-  console.log(
-    'Serving static assets from:',
-    path.join(__dirname, '..', '..', 'uploads/products')
-  );
   await app.listen(8000);
 }
 bootstrap();

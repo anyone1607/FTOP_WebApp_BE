@@ -92,6 +92,8 @@ export class VoucherService {
 
   // Fetch only non-deleted vouchers
   async findAll(): Promise<Voucher[]> {
-    return this.voucherRepository.find({ where: { isDeleted: false } });
+    return this.voucherRepository.find({ where: { isDeleted: false }
+    ,relations: ['store'], 
+  });
   }
 }
