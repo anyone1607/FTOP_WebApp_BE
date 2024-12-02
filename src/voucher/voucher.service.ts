@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Voucher } from '../voucher/entities/voucher.entity';
-import { Repository } from 'typeorm';
 import { VoucherDetails } from 'src/utils/types';
+import { Repository } from 'typeorm';
+import { Voucher } from '../voucher/entities/voucher.entity';
 @Injectable()
 export class VoucherService {
   constructor(
