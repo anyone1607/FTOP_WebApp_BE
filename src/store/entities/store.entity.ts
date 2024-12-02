@@ -1,6 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { Voucher } from '../../voucher/entities/voucher.entity';
 import { Order } from '../../order/entities/order.entity';
+import { User } from '../../user/entities/user.entity';
+
 @Entity()
 export class Store {
   @PrimaryGeneratedColumn()
@@ -15,8 +17,13 @@ export class Store {
   @Column()
   storePhone: number;
 
-  @Column({ nullable: false })
+  // join userId table user
+  @Column()
   ownerId: number;
+
+  @OneToOne(() => User, (user) => user.store) 
+  @JoinColumn({ name: 'ownerId' })
+  owner: User;
 
   @Column({ nullable: false })
   status: boolean;

@@ -21,21 +21,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
         console.log(accessToken);
         console.log(refreshToken);
         console.log(profile);
-
-        const fixedRoles = {
-            'admin@example.com': 'admin',
-            'manager@example.com': 'manager',
-            'staff@example.com': 'staff',
-        };
-
-        const email = profile.emails[0].value;
-        const role = fixedRoles[email] || 'store owner';
-
         const user = await this.authService.validateUser({ 
-            email, 
+            email: profile.emails[0].value, 
             displayName: profile.displayName,
-            avatar: profile.photos[0].value,
-            role,
+            avatar: profile.photos[1].value,
+            phoneNumber: '0123456789',
+            role: 'store owner',
             password: '123456789',
             walletBalance: 0,
             isActive: true

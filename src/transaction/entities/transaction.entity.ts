@@ -41,4 +41,5 @@ export class Transaction {
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'receiveUserId' })
   receiveUser: User;
+  
 }

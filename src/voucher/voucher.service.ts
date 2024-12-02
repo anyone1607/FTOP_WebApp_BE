@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Voucher } from '../voucher/entities/voucher.entity';
 import { Repository } from 'typeorm';
 import { VoucherDetails } from 'src/utils/types';
+
 @Injectable()
 export class VoucherService {
   constructor(
@@ -18,11 +19,6 @@ export class VoucherService {
     console.log('Voucher not found');
     const newVoucher = this.voucherRepository.create(details);
     return this.voucherRepository.save(newVoucher);
-  }
-
-  async create(voucherData: Partial<Voucher>): Promise<Voucher> {
-    const voucher = this.voucherRepository.create(voucherData);
-    return await this.voucherRepository.save(voucher);
   }
 
   async findOne(id: number): Promise<Voucher> {
@@ -57,7 +53,6 @@ export class VoucherService {
     }
   }
   
-
   // list deleted voucher in trash
   async getDeletedVouchers(): Promise<Voucher[]> {
     return await this.voucherRepository.find({
