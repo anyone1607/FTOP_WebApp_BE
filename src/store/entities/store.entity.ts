@@ -18,8 +18,8 @@ export class Store {
   storePhone: number;
 
   // join userId table user
-  @Column()
-  ownerId: number;
+  // @Column()
+  // ownerId: number;
 
   @OneToOne(() => User, (user) => user.store) 
   @JoinColumn({ name: 'ownerId' })

@@ -1,7 +1,8 @@
 import { Controller, Get, Param, Post, Body } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
-import { CreateUserDto } from '../dto/user.dto';
+import { CreateUserDto } from '../dto/register-user.dto';
+import { LoginUserDto } from '../dto/login-user.dto';
 @Controller('user')
 export class UserController {
 
@@ -24,8 +25,19 @@ export class UserController {
   }
 
   @Post('registerUser')
-  async register(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.usersService.registerUser(createUserDto);
+  register(@Body() createUserDto: CreateUserDto):void {
+     this.usersService.registerUser(createUserDto);
+  }
+
+  @Post('loginUser')
+  async login(@Body() loginUserDto: LoginUserDto): Promise<any> {
+    return this.usersService.loginUser(loginUserDto);
+  }
+
+  @Post('refreshToken') 
+  refreshToken(@Body() {refresh_token}): Promise<any> {
+    console.log(refresh_token);
+    return this.usersService.refreshToken(refresh_token);
   }
   
 }
