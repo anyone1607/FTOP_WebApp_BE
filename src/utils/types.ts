@@ -28,10 +28,4 @@ export type VoucherDetails = {
     isDeleted: boolean;
     deletedAt: Date;
 }
-export type CreateUserDto = {
-    email: string;
-    displayName: string;
-    avatar: string;
-    role: string;
-    password: string;
-}
+

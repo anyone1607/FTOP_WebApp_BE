@@ -19,6 +19,7 @@ import { StoreModule } from './store/store.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { VoucherModule } from './voucher/voucher.module';
 import { JwtModule } from '@nestjs/jwt';
+import { ZalopayModule } from './zalopay/zalopay.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { JwtModule } from '@nestjs/jwt';
       secret: 'your-secret-key',
       signOptions: { expiresIn: '60s' },
     }),
+    ZalopayModule,
   ],
   controllers: [
     AppController,
