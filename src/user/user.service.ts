@@ -30,7 +30,7 @@ export class UserService {
   // register user with email and password (android)
   async registerUser(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await this.hashPassword(createUserDto.password);
-    return await this.userRepository.save({ ...createUserDto, refresh_token: 'stringggg', password: hashedPassword });
+    return await this.userRepository.save({ ...createUserDto, refresh_token: 'refresh_token', password: hashedPassword });
   }
 
   // login user with email and password (android)

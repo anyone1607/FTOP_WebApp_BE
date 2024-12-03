@@ -29,6 +29,9 @@ export class User {
   @Column({ default: 0 })
   walletBalance: number;
 
+  @Column({ nullable: true })
+  pin: number;
+  
   @Column()
   refresh_token: string;
 
