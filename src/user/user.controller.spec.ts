@@ -103,4 +103,55 @@ describe('UserController', () => {
       expect(userService.findAllUsers).toHaveBeenCalled();
     });
   });
+
+  describe('Error Handling', () => {
+    describe('getTotalUsers', () => {
+      it('should return an error message if countTotalUsers fails', async () => {
+        jest.spyOn(userService, 'countTotalUsers').mockRejectedValue(new Error('Failed to count users'));
+  
+        await expect(userController.getTotalUsers()).rejects.toThrow('Failed to count users');
+        expect(userService.countTotalUsers).toHaveBeenCalled();
+      });
+    });
+  
+    
+    describe('findUser', () => {
+      it('should return an error message if user is not found', async () => {
+        const userId = 2;
+        // Mock the service to throw an exception
+        jest.spyOn(userService, 'findUser').mockImplementation(() => {
+          throw new Error(`User with ID ${userId} not found`);
+        });
+    
+        // Expect the controller to handle the exception correctly
+        await expect(userController.findUser(userId)).rejects.toThrow(
+          `User with ID ${userId} not found`,
+        );
+        expect(userService.findUser).toHaveBeenCalledWith(userId);
+      });
+    
+      it('should return an error message if findUser fails', async () => {
+        const userId = 2;
+        jest.spyOn(userService, 'findUser').mockRejectedValue(
+          new Error('Database query failed'),
+        );
+    
+        await expect(userController.findUser(userId)).rejects.toThrow(
+          'Database query failed',
+        );
+        expect(userService.findUser).toHaveBeenCalledWith(userId);
+      });
+    });
+    
+    
+    describe('findUsers', () => {
+      it('should return an error message if findAllUsers fails', async () => {
+        jest.spyOn(userService, 'findAllUsers').mockRejectedValue(new Error('Failed to retrieve users'));
+  
+        await expect(userController.findUsers()).rejects.toThrow('Failed to retrieve users');
+        expect(userService.findAllUsers).toHaveBeenCalled();
+      });
+    });
+  });
+  
 });
