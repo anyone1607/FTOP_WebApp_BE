@@ -18,6 +18,9 @@ import { StoreModule } from './store/store.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { VoucherModule } from './voucher/voucher.module';
 import { ZalopayModule } from './zalopay/zalopay.module';
+// import { MailerModule } from '@nestjs-modules/mailer';
+// import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+// import { join } from 'path';
 @Module({
   imports: [
     TypeOrmModule.forRoot(dataSourceOptions),
@@ -34,6 +37,26 @@ import { ZalopayModule } from './zalopay/zalopay.module';
     TransactionModule,
     VoucherModule,
     ZalopayModule,
+    // MailerModule.forRoot({
+    //   transport: {
+    //     host: 'smtp.example.com',
+    //     port: 587,
+    //     auth: {
+    //       user: 'ftop@gmail.com',
+    //       pass: '123456789',
+    //     },
+    //   },
+    //   defaults: {
+    //     from: '"No Reply" <no-reply@example.com>',
+    //   },
+    //   template: {
+    //     dir: join(__dirname, 'templates'),
+    //     adapter: new HandlebarsAdapter(), // npm install handlebars
+    //     options: {
+    //       strict: true,
+    //     },
+    //   },
+    // }),
   ],
   controllers: [
     AppController,

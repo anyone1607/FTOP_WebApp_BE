@@ -32,7 +32,7 @@ export class User {
   @Column({ nullable: true })
   pin: number;
   
-  @Column()
+  @Column( { nullable: true, default: null } )
   refresh_token: string;
 
   @CreateDateColumn()

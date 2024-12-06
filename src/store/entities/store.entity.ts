@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Voucher } from '../../voucher/entities/voucher.entity';
 import { Order } from '../../order/entities/order.entity';
 import { User } from '../../user/entities/user.entity';
@@ -21,17 +28,21 @@ export class Store {
   // @Column()
   // ownerId: number;
 
-  @OneToOne(() => User, (user) => user.store) 
+  @OneToOne(() => User, (user) => user.store)
   @JoinColumn({ name: 'ownerId' })
   owner: User;
 
   @Column({ nullable: false })
   status: boolean;
 
-  @OneToMany(() => Voucher, voucher => voucher.store)
+  // filed array storeImage
+  @Column('json', { nullable: true })
+  storeImage: string[];
+
+  @OneToMany(() => Voucher, (voucher) => voucher.store)
   vouchers: Voucher[];
 
-  @OneToMany(() => Order, order => order.store)
+  @OneToMany(() => Order, (order) => order.store)
   order: Order[];
   
 }
