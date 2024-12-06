@@ -1,18 +1,18 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class AddFiledStoreImage1733481995262 implements MigrationInterface {
-    name = 'AddFiledStoreImage1733481995262'
+export class AddFiledStoreImage1733483285415 implements MigrationInterface {
+    name = 'AddFiledStoreImage1733483285415'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`DROP INDEX \`FK_8025937032b0c2d3b1b0c563f8a\` ON \`bank_transfer\``);
-        await queryRunner.query(`DROP INDEX \`FK_1a79b2f719ecd9f307d62b81093\` ON \`order\``);
-        await queryRunner.query(`DROP INDEX \`FK_caabe91507b3379c7ba73637b84\` ON \`order\``);
-        await queryRunner.query(`DROP INDEX \`FK_cff8eff4c72e7c4cb5bf045447c\` ON \`order\``);
-        await queryRunner.query(`DROP INDEX \`FK_e079f969220581b631c9123f27d\` ON \`voucher\``);
-        await queryRunner.query(`DROP INDEX \`FK_a6e45c89cfbe8d92840266fd30f\` ON \`transaction\``);
-        await queryRunner.query(`DROP INDEX \`FK_f05df84c621b290c7e22ec529b8\` ON \`transaction\``);
-        await queryRunner.query(`DROP INDEX \`FK_f6204a9a4aabc1195fddcb3e917\` ON \`transaction\``);
-        await queryRunner.query(`ALTER TABLE \`store\` ADD \`storeImage\` json NULL`);
+        await queryRunner.query(`ALTER TABLE \`bank_transfer\` DROP FOREIGN KEY \`FK_8025937032b0c2d3b1b0c563f8a\``);
+        await queryRunner.query(`ALTER TABLE \`order\` DROP FOREIGN KEY \`FK_1a79b2f719ecd9f307d62b81093\``);
+        await queryRunner.query(`ALTER TABLE \`order\` DROP FOREIGN KEY \`FK_caabe91507b3379c7ba73637b84\``);
+        await queryRunner.query(`ALTER TABLE \`order\` DROP FOREIGN KEY \`FK_cff8eff4c72e7c4cb5bf045447c\``);
+        await queryRunner.query(`ALTER TABLE \`store\` DROP FOREIGN KEY \`FK_a83068090fe4511e5047484b09a\``);
+        await queryRunner.query(`ALTER TABLE \`voucher\` DROP FOREIGN KEY \`FK_e079f969220581b631c9123f27d\``);
+        await queryRunner.query(`ALTER TABLE \`transaction\` DROP FOREIGN KEY \`FK_a6e45c89cfbe8d92840266fd30f\``);
+        await queryRunner.query(`ALTER TABLE \`transaction\` DROP FOREIGN KEY \`FK_f05df84c621b290c7e22ec529b8\``);
+        await queryRunner.query(`ALTER TABLE \`transaction\` DROP FOREIGN KEY \`FK_f6204a9a4aabc1195fddcb3e917\``);
         await queryRunner.query(`ALTER TABLE \`bank_transfer\` CHANGE \`transferAmount\` \`transferAmount\` decimal(10,2) NOT NULL`);
         await queryRunner.query(`ALTER TABLE \`user\` DROP COLUMN \`email\``);
         await queryRunner.query(`ALTER TABLE \`user\` ADD \`email\` varchar(255) NOT NULL`);
@@ -68,7 +68,7 @@ export class AddFiledStoreImage1733481995262 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`store\` ADD \`storeAddress\` varchar(255) NOT NULL`);
         await queryRunner.query(`ALTER TABLE \`order\` CHANGE \`totalPrice\` \`totalPrice\` decimal NOT NULL`);
         await queryRunner.query(`ALTER TABLE \`user\` DROP COLUMN \`refresh_token\``);
-        await queryRunner.query(`ALTER TABLE \`user\` ADD \`refresh_token\` varchar(255) NOT NULL`);
+        await queryRunner.query(`ALTER TABLE \`user\` ADD \`refresh_token\` varchar(255) NULL`);
         await queryRunner.query(`ALTER TABLE \`user\` DROP COLUMN \`password\``);
         await queryRunner.query(`ALTER TABLE \`user\` ADD \`password\` varchar(255) NOT NULL`);
         await queryRunner.query(`ALTER TABLE \`user\` DROP COLUMN \`role\``);
@@ -82,15 +82,15 @@ export class AddFiledStoreImage1733481995262 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`user\` DROP COLUMN \`email\``);
         await queryRunner.query(`ALTER TABLE \`user\` ADD \`email\` varchar(255) NOT NULL`);
         await queryRunner.query(`ALTER TABLE \`bank_transfer\` CHANGE \`transferAmount\` \`transferAmount\` decimal NOT NULL`);
-        await queryRunner.query(`ALTER TABLE \`store\` DROP COLUMN \`storeImage\``);
-        await queryRunner.query(`CREATE INDEX \`FK_f6204a9a4aabc1195fddcb3e917\` ON \`transaction\` (\`receiveUserId\`)`);
-        await queryRunner.query(`CREATE INDEX \`FK_f05df84c621b290c7e22ec529b8\` ON \`transaction\` (\`transferUserId\`)`);
-        await queryRunner.query(`CREATE INDEX \`FK_a6e45c89cfbe8d92840266fd30f\` ON \`transaction\` (\`orderId\`)`);
-        await queryRunner.query(`CREATE INDEX \`FK_e079f969220581b631c9123f27d\` ON \`voucher\` (\`storeStoreId\`)`);
-        await queryRunner.query(`CREATE INDEX \`FK_cff8eff4c72e7c4cb5bf045447c\` ON \`order\` (\`voucherId\`)`);
-        await queryRunner.query(`CREATE INDEX \`FK_caabe91507b3379c7ba73637b84\` ON \`order\` (\`userId\`)`);
-        await queryRunner.query(`CREATE INDEX \`FK_1a79b2f719ecd9f307d62b81093\` ON \`order\` (\`storeId\`)`);
-        await queryRunner.query(`CREATE INDEX \`FK_8025937032b0c2d3b1b0c563f8a\` ON \`bank_transfer\` (\`walletUserId\`)`);
+        await queryRunner.query(`ALTER TABLE \`transaction\` ADD CONSTRAINT \`FK_f6204a9a4aabc1195fddcb3e917\` FOREIGN KEY (\`receiveUserId\`) REFERENCES \`sep490_ftop\`.\`user\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`transaction\` ADD CONSTRAINT \`FK_f05df84c621b290c7e22ec529b8\` FOREIGN KEY (\`transferUserId\`) REFERENCES \`sep490_ftop\`.\`user\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`transaction\` ADD CONSTRAINT \`FK_a6e45c89cfbe8d92840266fd30f\` FOREIGN KEY (\`orderId\`) REFERENCES \`sep490_ftop\`.\`order\`(\`orderId\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`voucher\` ADD CONSTRAINT \`FK_e079f969220581b631c9123f27d\` FOREIGN KEY (\`storeStoreId\`) REFERENCES \`sep490_ftop\`.\`store\`(\`storeId\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`store\` ADD CONSTRAINT \`FK_a83068090fe4511e5047484b09a\` FOREIGN KEY (\`ownerId\`) REFERENCES \`sep490_ftop\`.\`user\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`order\` ADD CONSTRAINT \`FK_cff8eff4c72e7c4cb5bf045447c\` FOREIGN KEY (\`voucherId\`) REFERENCES \`sep490_ftop\`.\`voucher\`(\`voucherId\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`order\` ADD CONSTRAINT \`FK_caabe91507b3379c7ba73637b84\` FOREIGN KEY (\`userId\`) REFERENCES \`sep490_ftop\`.\`user\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`order\` ADD CONSTRAINT \`FK_1a79b2f719ecd9f307d62b81093\` FOREIGN KEY (\`storeId\`) REFERENCES \`sep490_ftop\`.\`store\`(\`storeId\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`bank_transfer\` ADD CONSTRAINT \`FK_8025937032b0c2d3b1b0c563f8a\` FOREIGN KEY (\`walletUserId\`) REFERENCES \`sep490_ftop\`.\`user\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
     }
 
 }
