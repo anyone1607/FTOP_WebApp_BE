@@ -54,6 +54,10 @@ export class VoucherController {
     return this.voucherService.permanentlyDelete(id);
   }
 
-  
+  // http://localhost:8000/api/voucher/store/{storeId}
+  @Get('store/:storeId')
+  async getVouchersByStoreId(@Param('storeId') storeId: number): Promise<Voucher[]> {
+    return await this.voucherService.findByStoreId(+storeId);
+  }
 
 }

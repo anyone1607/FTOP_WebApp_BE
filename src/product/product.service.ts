@@ -36,4 +36,12 @@ export class ProductService {
       const result = await this.productRepository.delete(id);
       return result.affected > 0;
     }
+
+    // Get products by storeId (android)
+    async getProductsByStoreId(storeId: number): Promise<Product[]> {
+      return this.productRepository.find({
+        where: { storeId },
+      });
+    }
+
 }

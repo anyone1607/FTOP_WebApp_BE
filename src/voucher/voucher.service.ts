@@ -89,4 +89,13 @@ export class VoucherService {
   async findAll(): Promise<Voucher[]> {
     return this.voucherRepository.find({ where: { isDeleted: false } });
   }
+
+  // Get voucher by storeId (android)
+  async findByStoreId(storeId: number): Promise<Voucher[]> {
+    return await this.voucherRepository.find({
+      where: { store: { storeId }, isDeleted: false },
+      relations: ['store'],
+    });
+  }
+  
 }

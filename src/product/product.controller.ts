@@ -73,6 +73,11 @@ export class ProductController {
     }
   }
 
+  @Get('store/:storeId')
+  async getProductsByStoreId(@Param('storeId') storeId: string): Promise<Product[]> {
+    return this.productService.getProductsByStoreId(Number(storeId));
+  }
+
   @Put('/:id')
   async updateProduct(
     @Body() productDto: ProductDto,
