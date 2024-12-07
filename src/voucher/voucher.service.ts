@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Voucher } from '../voucher/entities/voucher.entity';
-import { Repository } from 'typeorm';
+import { Repository ,Like,Between } from 'typeorm';
 import { VoucherDetails } from 'src/utils/types';
 @Injectable()
 export class VoucherService {
@@ -91,9 +91,39 @@ export class VoucherService {
   }
 
   // Fetch only non-deleted vouchers
-  async findAll(): Promise<Voucher[]> {
-    return this.voucherRepository.find({ where: { isDeleted: false }
-    ,relations: ['store'], 
-  });
+  // async findAll(): Promise<Voucher[]> {
+  //   return this.voucherRepository.find({ where: { isDeleted: false }
+  //   ,relations: ['store'], 
+  // });
+  // }
+  async findAll(userId: number, role: string): Promise<Voucher[]> {
+    if (role === 'store-owner') {
+      return this.voucherRepository.find({
+        where: { isDeleted: false, store: { ownerId: userId } },
+        relations: ['store'],
+      });
+    } else {
+      return this.voucherRepository.find({
+        where: { isDeleted: false },
+        relations: ['store'],
+      });
+    }
+  }
+  
+  async filter(filter?: string, minDiscount?: string, maxDiscount?: string): Promise<Voucher[]> {
+    const where: any = { isDeleted: false };
+
+    if (filter) {
+      where.voucherName = Like(`%${filter}%`);
+    }
+
+    if (minDiscount && maxDiscount) {
+      where.voucherDiscount = Between(parseInt(minDiscount), parseInt(maxDiscount));
+    }
+
+    return this.voucherRepository.find({
+      where,
+      relations: ['store'],
+    });
   }
 }

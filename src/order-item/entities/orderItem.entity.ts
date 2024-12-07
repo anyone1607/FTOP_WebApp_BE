@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn,ManyToOne,JoinColumn } from 'typeorm';
+import { Order } from 'src/order/entities/order.entity';
+import { Product } from 'src/product/entities/product.entity';
 
 @Entity()
 export class OrderItem {
@@ -8,8 +10,16 @@ export class OrderItem {
   @Column({ nullable: false })
   orderId: number;
 
+  @ManyToOne(() => Order, order => order.orderItems)
+  @JoinColumn({ name: 'orderId' }) // Đảm bảo khóa ngoại liên kết
+  order: Order;
+
   @Column({ nullable: false })
   productId: number;
+
+  @ManyToOne(() => Product, product => product.orderItems)
+  @JoinColumn({ name: 'productId' }) // Đảm bảo khóa ngoại liên kết
+  product: Product;
 
   @Column({ nullable: false })
   quantity: number;
@@ -17,7 +27,5 @@ export class OrderItem {
   @Column('decimal', { precision: 10, scale: 2, nullable: false })
   unitPrice: number;
 
-  @Column()
-  voucherId: number;
   
 }

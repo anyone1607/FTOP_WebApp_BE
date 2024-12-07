@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository ,Like } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { ProductDto } from 'src/dto/product.dto';
 @Injectable()
@@ -10,18 +10,31 @@ export class ProductService {
       @InjectRepository(Product)
       private readonly productRepository: Repository<Product>
     ) {}
-    async getProducts(): Promise<Product[]> {
-      const products = await this.productRepository.find({
-        relations: ['category', 'store'],  // Bao gồm các mối quan hệ với Category và Store
-      });
+    // async getProducts(): Promise<Product[]> {
+    //   const products = await this.productRepository.find({
+    //     relations: ['category', 'store'],  // Bao gồm các mối quan hệ với Category và Store
+    //   });
     
-      return products.map((product) => {
-        return {
-          ...product,
-          categoryName: product.category?.categoryName, // Lấy tên của category
-          storeName: product.store?.storeName, // Lấy tên của store
-        };
-      });
+    //   return products.map((product) => {
+    //     return {
+    //       ...product,
+    //       categoryName: product.category?.categoryName, // Lấy tên của category
+    //       storeName: product.store?.storeName, // Lấy tên của store
+    //     };
+    //   });
+    // }
+    async getProducts(userId: number, role: string): Promise<Product[]> {
+      if (role === 'store-owner') {
+        return this.productRepository.find({
+          where: { isDeleted: false, store: { ownerId: userId } },
+          relations: ['category', 'store'],
+        });
+      } else {
+        return this.productRepository.find({
+          where: { isDeleted: false },
+          relations: ['category', 'store'],
+        });
+      }
     }
 
     
@@ -74,5 +87,58 @@ export class ProductService {
         product.deletedAt = new Date();
         await this.productRepository.save(product);
       }
+    }
+    // async filterProducts(filter?: string, categoryName?: string, storeName?: string): Promise<Product[]> {
+    //   const queryBuilder = this.productRepository.createQueryBuilder('product')
+    //     .leftJoinAndSelect('product.category', 'category')
+    //     .leftJoinAndSelect('product.store', 'store');
+  
+    //   if (filter) {
+    //     queryBuilder.andWhere('product.productName LIKE :filter', { filter: `%${filter}%` });
+    //   }
+  
+    //   if (categoryName) {
+    //     queryBuilder.andWhere('category.categoryName = :categoryName', { categoryName });
+    //   }
+  
+    //   if (storeName) {
+    //     queryBuilder.andWhere('store.storeName = :storeName', { storeName });
+    //   }
+  
+    //   const products = await queryBuilder.getMany();
+  
+    //   return products.map((product) => ({
+    //     ...product,
+    //     categoryName: product.category?.categoryName,
+    //     storeName: product.store?.storeName,
+    //   }));
+    // }
+    async filterProducts(filter?: string, categoryName?: string, storeName?: string, userId?: number, role?: string): Promise<Product[]> {
+      const queryBuilder = this.productRepository.createQueryBuilder('product')
+        .leftJoinAndSelect('product.category', 'category')
+        .leftJoinAndSelect('product.store', 'store');
+  
+      if (filter) {
+        queryBuilder.andWhere('product.productName LIKE :filter', { filter: `%${filter}%` });
+      }
+  
+      if (categoryName) {
+        queryBuilder.andWhere('category.categoryName = :categoryName', { categoryName });
+      }
+  
+      if (storeName) {
+        queryBuilder.andWhere('store.storeName = :storeName', { storeName });
+      }
+  
+      if (role === 'store-owner') {
+        queryBuilder.andWhere('store.ownerId = :userId', { userId });
+      }
+  
+      const products = await queryBuilder.getMany();
+      return products.map(product => ({
+        ...product,
+        categoryName: product.category?.categoryName,
+        storeName: product.store?.storeName,
+      }));
     }
 }

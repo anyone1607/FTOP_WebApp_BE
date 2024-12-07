@@ -1,6 +1,7 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, JoinColumn  } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, JoinColumn,OneToMany  } from 'typeorm';
 import { Store } from '../../store/entities/store.entity';
 import { Category } from '../../category/entities/category.entity';
+import { OrderItem } from 'src/order-item/entities/orderItem.entity';
 
 @Entity()
 export class Product {
@@ -38,4 +39,7 @@ export class Product {
 
   @Column({ nullable: false })
   storeId: number;  // storeId là khóa ngoại  
+
+  @OneToMany(() => OrderItem, orderItem => orderItem.product)
+  orderItems: OrderItem[];
 }

@@ -48,4 +48,11 @@ export class TransactionController {
     return this.transactionService.transferMoney(transferUserId, receiveUserId, amount, description);
   }
 
+  @Get('searchAll/:userId')
+  async findAllTransactionsForUser(
+    @Param('userId', ParseIntPipe) userId: number,
+  ): Promise<Transaction[]> {
+    return this.transactionService.findAllTransactionsForUser(userId);
+  }
+
 }

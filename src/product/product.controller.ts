@@ -7,7 +7,8 @@ import {
   Post,
   Put,
   ValidationPipe,
-  UseGuards
+  UseGuards,
+  Query
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ResponseData } from 'src/global/globalClass';
@@ -28,21 +29,17 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
-  async getProducts(): Promise<ResponseData<Product[]>> {
+  async getProducts(
+    @Query('userId') userId: number,
+    @Query('role') role: string,
+  ): Promise<ResponseData<Product[]>> {
     try {
-      // Lấy danh sách sản phẩm từ service
-      const products = await this.productService.getProducts();
-  
-      // Ánh xạ thêm thông tin categoryName và storeName vào sản phẩm
-      const responseProducts = products.map(product => {
-        return {
-          ...product,
-          categoryName: product.category?.categoryName, // Thêm categoryName
-          storeName: product.store?.storeName, // Thêm storeName
-        };
-      });
-  
-      // Trả về response đã được ánh xạ
+      const products = await this.productService.getProducts(userId, role);
+      const responseProducts = products.map(product => ({
+        ...product,
+        categoryName: product.category?.categoryName,
+        storeName: product.store?.storeName,
+      }));
       return new ResponseData<Product[]>(
         responseProducts,
         HttpStatus.OK,
@@ -55,6 +52,37 @@ export class ProductController {
         HttpStatus.INTERNAL_SERVER_ERROR,
         HttpMessage.INTERNAL_SERVER_ERROR,
       );
+    }
+  }
+
+  // @Get('filter')
+  // async filterProducts(
+  //   @Query('filter') filter: string,
+  //   @Query('categoryName') categoryName: string,
+  //   @Query('storeName') storeName: string,
+  // ): Promise<ResponseData<Product[]>> {
+  //   try {
+  //     const products = await this.productService.filterProducts(filter, categoryName, storeName);
+  //     return new ResponseData<Product[]>(products, HttpStatus.OK, HttpMessage.OK);
+  //   } catch (error) {
+  //     console.error(error);
+  //     return new ResponseData<Product[]>(null, HttpStatus.INTERNAL_SERVER_ERROR, HttpMessage.INTERNAL_SERVER_ERROR);
+  //   }
+  // }
+  @Get('filter')
+  async filterProducts(
+    @Query('filter') filter: string,
+    @Query('categoryName') categoryName: string,
+    @Query('storeName') storeName: string,
+    @Query('userId') userId: number,
+    @Query('role') role: string,
+  ): Promise<ResponseData<Product[]>> {
+    try {
+      const products = await this.productService.filterProducts(filter, categoryName, storeName, userId, role);
+      return new ResponseData<Product[]>(products, HttpStatus.OK, HttpMessage.OK);
+    } catch (error) {
+      console.error(error);
+      return new ResponseData<Product[]>(null, HttpStatus.INTERNAL_SERVER_ERROR, HttpMessage.INTERNAL_SERVER_ERROR);
     }
   }
 

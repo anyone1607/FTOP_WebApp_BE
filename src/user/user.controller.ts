@@ -30,4 +30,11 @@ export class UserController {
     return await this.usersService.searchUsers(query, role);
   }
 
+  @Get('email/:email')
+  async findByEmail(@Param('email') email: string): Promise<User> {
+    return await this.usersService.findByEmail(email);
+  }
+
+
+
 }
