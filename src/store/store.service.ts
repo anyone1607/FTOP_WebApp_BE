@@ -18,6 +18,15 @@ export class StoreService {
   async findAll(): Promise<Store[]> {
     return await this.storeRepository.find({ relations: ['vouchers'] });
   }
+  // GET 4 new stores
+  async findLatestedStores(): Promise<Store[]> {
+    return await this.storeRepository
+      .createQueryBuilder('store')
+      .leftJoinAndSelect('store.vouchers', 'vouchers')
+      .orderBy('store.storeId', 'DESC')
+      .take(4)
+      .getMany();
+  }
   // Get one store by id
   async findOne(id: number): Promise<Store> {
     const store = await this.storeRepository.findOne({
@@ -49,29 +58,37 @@ export class StoreService {
     await this.storeRepository.remove(store);
   }
 
-  async getOrderCountByStore(filterType?: 'day' | 'month' | 'year', filterValue?: string): Promise<any> {
+  async getOrderCountByStore(
+    filterType?: 'day' | 'month' | 'year',
+    filterValue?: string,
+  ): Promise<any> {
     const queryBuilder = this.storeRepository
       .createQueryBuilder('store')
       .select('store.storeId', 'storeId')
       .addSelect('store.storeName', 'storeName')
       .addSelect('COUNT(order.orderId)', 'orderCount')
       .leftJoin('store.order', 'order');
-  
+
     if (filterType === 'day') {
-      queryBuilder.where('DATE(order.orderDate) = :filterValue', { filterValue });
-    } else if (filterType === 'month') {
-      queryBuilder.where('MONTH(order.orderDate) = :month AND YEAR(order.orderDate) = :year', {
-        month: filterValue.split('-')[1], 
-        year: filterValue.split('-')[0],
+      queryBuilder.where('DATE(order.orderDate) = :filterValue', {
+        filterValue,
       });
+    } else if (filterType === 'month') {
+      queryBuilder.where(
+        'MONTH(order.orderDate) = :month AND YEAR(order.orderDate) = :year',
+        {
+          month: filterValue.split('-')[1],
+          year: filterValue.split('-')[0],
+        },
+      );
     } else if (filterType === 'year') {
-      queryBuilder.where('YEAR(order.orderDate) = :filterValue', { filterValue });
+      queryBuilder.where('YEAR(order.orderDate) = :filterValue', {
+        filterValue,
+      });
     }
-  
+
     queryBuilder.groupBy('store.storeId').addGroupBy('store.storeName');
-  
+
     return await queryBuilder.getRawMany();
   }
-  
-
 }
