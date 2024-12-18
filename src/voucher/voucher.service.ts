@@ -1,14 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Voucher } from '../voucher/entities/voucher.entity';
-import { Repository ,Like,Between } from 'typeorm';
+
+import { Repository, Like, Between } from 'typeorm';
 import { VoucherDetails } from 'src/utils/types';
 @Injectable()
 export class VoucherService {
   constructor(
     @InjectRepository(Voucher)
     private readonly voucherRepository: Repository<Voucher>,
-  ) {}
+  ) { }
 
   async validateVoucher(details: VoucherDetails) {
     const voucher = await this.voucherRepository.findOneBy({
@@ -56,7 +57,7 @@ export class VoucherService {
       await this.voucherRepository.save(voucher);
     }
   }
-  
+
 
   // list deleted voucher in trash
   async getDeletedVouchers(): Promise<Voucher[]> {
@@ -66,18 +67,22 @@ export class VoucherService {
     });
   }
 
-  // restore deleted voucher
-  async restore(id: number): Promise<void> {
+  async restore(id: number, expiredDate: string, createDate: string): Promise<Voucher> {
     const voucher = await this.voucherRepository.findOne({
       where: { voucherId: id, isDeleted: true },
+      relations: ['store'],
     });
     if (!voucher) {
       throw new NotFoundException(`Voucher with ID ${id} not found or not deleted`);
     }
     voucher.isDeleted = false;
     voucher.deletedAt = null;
+    voucher.expiredDate = new Date(expiredDate);
+    voucher.createdDate = new Date(createDate);
     await this.voucherRepository.save(voucher);
+    return voucher;
   }
+
 
   // permanently delete
   async permanentlyDelete(id: number): Promise<void> {
@@ -90,12 +95,7 @@ export class VoucherService {
     await this.voucherRepository.delete(id);
   }
 
-  // Fetch only non-deleted vouchers
-  // async findAll(): Promise<Voucher[]> {
-  //   return this.voucherRepository.find({ where: { isDeleted: false }
-  //   ,relations: ['store'], 
-  // });
-  // }
+
   async findAll(userId: number, role: string): Promise<Voucher[]> {
     if (role === 'store-owner') {
       return this.voucherRepository.find({
@@ -109,21 +109,25 @@ export class VoucherService {
       });
     }
   }
-  
-  async filter(filter?: string, minDiscount?: string, maxDiscount?: string): Promise<Voucher[]> {
-    const where: any = { isDeleted: false };
+
+  async filter(filter?: string, minDiscount?: string, maxDiscount?: string, userId?: number, role?: string): Promise<Voucher[]> {
+    const queryBuilder = this.voucherRepository.createQueryBuilder('voucher')
+      .leftJoinAndSelect('voucher.store', 'store')
+      .where('voucher.isDeleted = :isDeleted', { isDeleted: false });
 
     if (filter) {
-      where.voucherName = Like(`%${filter}%`);
+      queryBuilder.andWhere('voucher.voucherName LIKE :filter', { filter: `%${filter}%` });
     }
 
     if (minDiscount && maxDiscount) {
-      where.voucherDiscount = Between(parseInt(minDiscount), parseInt(maxDiscount));
+      queryBuilder.andWhere('voucher.voucherDiscount BETWEEN :minDiscount AND :maxDiscount', { minDiscount: parseInt(minDiscount), maxDiscount: parseInt(maxDiscount) });
     }
 
-    return this.voucherRepository.find({
-      where,
-      relations: ['store'],
-    });
+    if (role === 'store-owner') {
+      queryBuilder.andWhere('store.ownerId = :userId', { userId });
+    }
+
+    const vouchers = await queryBuilder.getMany();
+    return vouchers;
   }
 }

@@ -25,10 +25,17 @@ export class OrderService {
     return parseFloat(result.totalPrice || '0');
   }
 
-  async findAll(): Promise<Order[]> {
+  async findAll(userId: string, role: string): Promise<Order[]> {
+    if (role === 'store-owner') {
+      const ownerId = parseInt(userId, 10); // Chuyển đổi userId từ string sang number
+      return await this.orderRepository.find({
+        where: { store: { ownerId: ownerId }, isDeleted: false },
+        relations: ['user', 'store', 'voucher', 'orderItems'],
+      });
+    }
     return await this.orderRepository.find({
       where: { isDeleted: false },
-      relations: ['user', 'store', 'voucher','orderItems'],
+      relations: ['user', 'store', 'voucher', 'orderItems'],
     });
   }
 

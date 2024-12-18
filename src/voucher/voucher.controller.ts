@@ -12,23 +12,19 @@ import { VoucherService } from './voucher.service';
 import { Voucher } from './entities/voucher.entity';
 @Controller('voucher')
 export class VoucherController {
-  constructor(private readonly voucherService: VoucherService) {}
-  
-  // @Get()
-  // async findAll(): Promise<Voucher[]> {
-  //   return this.voucherService.findAll();
-  // }
+  constructor(private readonly voucherService: VoucherService) { }
+
   @Get()
   async findAll(@Query('userId') userId: number, @Query('role') role: string): Promise<Voucher[]> {
     return this.voucherService.findAll(userId, role);
   }
-  
+
   // tim delete da bi xoa mem
   @Get('deleted')
   async getDeletedVouchers(): Promise<Voucher[]> {
     return this.voucherService.getDeletedVouchers();
   }
-  
+
 
   @Post()
   create(@Body() voucherData: Partial<Voucher>) {
@@ -40,15 +36,17 @@ export class VoucherController {
     @Query('filter') filter: string,
     @Query('minDiscount') minDiscount: string,
     @Query('maxDiscount') maxDiscount: string,
+    @Query('userId') userId: number,
+    @Query('role') role: string,
   ): Promise<Voucher[]> {
-    return this.voucherService.filter(filter, minDiscount, maxDiscount);
+    return this.voucherService.filter(filter, minDiscount, maxDiscount, userId, role);
   }
 
   @Get(':id')
   findOne(@Param('id') id: number): Promise<Voucher> {
     return this.voucherService.findOne(id);
   }
-  
+
 
   @Patch(':id')
   update(
@@ -65,8 +63,12 @@ export class VoucherController {
 
   // khoi phuc lai voucher da bi xoa mem
   @Patch(':id/restore')
-  async restore(@Param('id') id: number): Promise<void> {
-    return this.voucherService.restore(id);
+  async restoreVoucher(
+    @Param('id') voucherId: number,
+    @Body('expiredDate') expiredDate: string,
+    @Body('createDate') createDate: string,
+  ): Promise<Voucher> {
+    return this.voucherService.restore(voucherId, expiredDate, createDate);
   }
 
   // xoa that sự
@@ -76,8 +78,8 @@ export class VoucherController {
     return this.voucherService.permanentlyDelete(id);
   }
 
-  
 
-  
+
+
 
 }

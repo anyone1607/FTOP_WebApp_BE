@@ -1,4 +1,4 @@
-import { Controller, Get, Delete, Param } from '@nestjs/common';
+import { Controller, Get, Delete, Param,Query } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { Order } from './entities/order.entity';
 @Controller('order')
@@ -18,8 +18,11 @@ export class OrderController {
   }
   
   @Get()
-  async findAll(): Promise<Order[]> {
-    return await this.orderService.findAll();
+  async findAll(
+    @Query('userId') userId: string,
+    @Query('role') role: string,
+  ): Promise<Order[]> {
+    return await this.orderService.findAll(userId, role);
   }
   
   

@@ -29,6 +29,10 @@ async function bootstrap() {
     '/uploads/products',
     express.static(path.join(__dirname, '..', '..', 'uploads/products'))
   );
+  app.use(
+    '/uploads/store',
+    express.static(path.join(__dirname, '..', '..', 'uploads/store'))
+  );
   await app.listen(8000);
 }
 bootstrap();
