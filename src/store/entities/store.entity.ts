@@ -29,7 +29,7 @@ export class Store {
   // ownerId: number;
 
   @OneToOne(() => User, (user) => user.store)
-  @JoinColumn({ name: 'ownerId' })
+  @JoinColumn({ name: 'ownerId'})
   owner: User;
 
   @Column({ nullable: false })

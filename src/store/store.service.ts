@@ -2,11 +2,18 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Store } from './entities/store.entity';
+import { Product } from '../product/entities/product.entity';
+import { Order } from '../order/entities/order.entity';
+
 @Injectable()
 export class StoreService {
   constructor(
     @InjectRepository(Store)
     private readonly storeRepository: Repository<Store>,
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
   ) {}
 
   // create a new store
@@ -15,8 +22,26 @@ export class StoreService {
     return await this.storeRepository.save(store);
   }
   // Get all stores
-  async findAll(): Promise<Store[]> {
-    return await this.storeRepository.find({ relations: ['vouchers'] });
+  // async findAll(): Promise<Store[]> {
+  //   return await this.storeRepository.find({ relations: ['vouchers'] });
+  // }
+
+  async findAll(): Promise<any> {
+    const stores = await this.storeRepository.find();
+    const labels = this.getLast6Months();
+
+    const result = await Promise.all(
+      stores.map(async (store) => ({
+        ...store,
+        sales: {
+          labels: labels,
+          data: await this.getSalesDataByStore(store.storeId),
+          data1: await this.getSalesDataByStore1(store.storeId),
+        },
+      })),
+    );
+
+    return result;
   }
   // GET 4 new stores
   async findLatestedStores(): Promise<Store[]> {
@@ -26,6 +51,17 @@ export class StoreService {
       .orderBy('store.storeId', 'DESC')
       .take(4)
       .getMany();
+  }
+  // store details
+  async getStoreWithProducts(storeId: number) {
+    const store = await this.storeRepository.findOne({ where: { storeId } });
+    if (!store) {
+      throw new Error('Store not found');
+    }
+    const products = await this.productRepository.find({
+      where: { storeId, status: true },
+    });
+    return { store, products };
   }
   // Get one store by id
   async findOne(id: number): Promise<Store> {
@@ -91,4 +127,77 @@ export class StoreService {
 
     return await queryBuilder.getRawMany();
   }
+
+  // hàm tính toán 6 tháng gần nhất
+  private getLast6Months(): string[] {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    const currentMonth = new Date().getMonth();
+    const last6Months = [];
+    for (let i = 5; i >= 0; i--) {
+      const monthIndex = (currentMonth - i + 12) % 12;
+      last6Months.push(months[monthIndex]);
+    }
+    return last6Months;
+  }
+
+  private async getSalesDataByStore(storeId: number): Promise<number[]> {
+    const labels = this.getLast6Months();
+    const salesData = [];
+
+    for (const month of labels) {
+      const monthIndex =
+        new Date(`${month} 1, ${new Date().getFullYear()}`).getMonth() + 1;
+
+      const totalProducts = await this.orderRepository
+        .createQueryBuilder('order')
+        .where('order.storeId = :storeId', { storeId })
+        .andWhere('order.orderStatus = :status', { status: true })
+        .andWhere('MONTH(order.orderDate) = :month', { month: monthIndex })
+        .andWhere('YEAR(order.orderDate) = :year', {
+          year: new Date().getFullYear(),
+        })
+        .select('COUNT(order.orderId)', 'count') // Đếm số lượng đơn hàng
+        .getRawOne();
+
+      salesData.push(Number(totalProducts.count) || 0);
+    }
+    return salesData;
+  }
+
+  private async getSalesDataByStore1(storeId: number): Promise<number[]> {
+    const labels = this.getLast6Months();
+    const salesData = [];
+
+    for (const month of labels) {
+      const monthIndex = new Date(`${month} 1, ${new Date().getFullYear()}`).getMonth() + 1;
+
+      const totalSales = await this.orderRepository
+        .createQueryBuilder('order')
+        .where('order.storeId = :storeId', { storeId })
+        .andWhere('order.orderStatus = :status', { status: true })
+        .andWhere('MONTH(order.orderDate) = :month', { month: monthIndex })
+        .andWhere('YEAR(order.orderDate) = :year', { year: new Date().getFullYear() })
+        .select('SUM(order.totalPrice)', 'total')
+        .getRawOne();
+
+      salesData.push(Number(totalSales.total) || 0);
+    }
+    return salesData;
+  }
+
+
+
 }

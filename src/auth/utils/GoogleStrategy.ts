@@ -2,18 +2,18 @@ import { Injectable, Inject } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile } from 'passport-google-oauth20';
 import { AuthService } from '../auth.service';
-
+import { ConfigService } from '@nestjs/config';
 @Injectable()
-export class GoogleStrategy extends PassportStrategy(Strategy) {
+export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(
+    private readonly configService: ConfigService,
     @Inject('AUTH_SERVICE')
     private readonly authService: AuthService,
   ) {
     super({
-      clientID:
-        '493141261768-evsi4cjtlul83un645fgcgafi8ldobvl.apps.googleusercontent.com',
-      clientSecret: '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',
-      callbackURL: 'http://localhost:8000/api/auth/google/redirect',
+      clientID: configService.get<string>('GOOGLE_CLIENT_ID'),
+      clientSecret: configService.get<string>('GOOGLE_CLIENT_SECRET'),
+      callbackURL: configService.get<string>('GOOGLE_CALLBACK_URL'),
       scope: ['profile', 'email'],
     });
   }
@@ -23,12 +23,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
     console.log(refreshToken);
     console.log(profile);
     const user = await this.authService.validateUser({
-      email: profile.emails?.[0]?.value || null, 
-      displayName: profile.displayName || 'No Name', 
+      email: profile.emails?.[0]?.value || null,
+      displayName: profile.displayName || 'No Name',
       avatar: profile.photos?.[1]?.value || profile.photos?.[0]?.value || null,
-      phoneNumber: '0123456789',
-      role: 'store owner',
-      password: '123456789',
+      phoneNumber: null,
+      role: 'owner',
+      password: null,
       walletBalance: 0,
       isActive: true,
     });

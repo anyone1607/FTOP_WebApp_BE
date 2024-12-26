@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, CreateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  OneToOne,
+  CreateDateColumn,
+} from 'typeorm';
 import { Order } from '../../order/entities/order.entity';
 import { BankTransfer } from '../../banktransfer/entities/banktransfer.entity';
 import { Store } from '../../store/entities/store.entity';
@@ -19,7 +26,7 @@ export class User {
 
   @Column({ nullable: true })
   phoneNumber: string;
-  
+
   @Column()
   role: string;
 
@@ -31,8 +38,8 @@ export class User {
 
   @Column({ nullable: true })
   pin: number;
-  
-  @Column( { nullable: true, default: null } )
+
+  @Column({ nullable: true, default: null })
   refresh_token: string;
 
   @CreateDateColumn()
@@ -44,13 +51,13 @@ export class User {
   @Column()
   isActive: boolean;
 
-  @OneToMany(() => Order, order => order.user)
-  order: Order[]
+  @OneToMany(() => Order, (order) => order.user)
+  order: Order[];
 
-  @OneToMany(() => BankTransfer, bankTransfer => bankTransfer.user)
+  @OneToMany(() => BankTransfer, (bankTransfer) => bankTransfer.user)
   bankTransfers: BankTransfer[];
 
   @OneToOne(() => Store, (store) => store.owner)
   store: Store;
-
+  
 }
