@@ -39,7 +39,7 @@ export class UserController {
   }
 
   @Post('loginUser')
-  async login(@Body() loginUserDto: LoginUserDto): Promise<any> {
+  async login(@Body(new ValidationPipe()) loginUserDto: LoginUserDto): Promise<User> {
     return this.usersService.loginUser(loginUserDto);
   }
 

@@ -29,33 +29,10 @@ export class PayosService {
     }
   }
 
-  // nạp tiền qua payos (successfully)
-  // async createPayment(amount: number, description: string) {
-  //   const orderCode = Math.floor(Math.random() * 1000000000);
-  //   const paymentData = {
-  //     amount,
-  //     description,
-  //     orderCode,
-  //     returnUrl: 'https://your-domain.com/success',
-  //     cancelUrl: 'https://your-domain.com/cancel',
-  //   };
-
-  //   try {
-  //     console.log('Creating payment with data:', paymentData);
-  //     const paymentLink = await this.payos.createPaymentLink(paymentData);
-  //     return paymentLink;
-  //   } catch (error) {
-  //     console.error('Error creating payment link:', error);
-  //     throw new Error('Failed to create payment link');
-  //   }
-  // }
-
   // nạp tiền qua payos (limited)
   async topUp(
     walletUserId: number,
     amount: number,
-    accountNumber: number,
-    bankName: string,
     description: string,
   ) {
     const user = await this.userRepository.findOne({
@@ -66,9 +43,10 @@ export class PayosService {
       throw new Error('User not found');
     }
 
+
     const paymentLink = await this.payos.createPaymentLink({
       amount,
-      description,
+      description: `Nạp tiền vào tài khoản ${walletUserId}`,
       orderCode: Math.floor(Math.random() * 1000000000),
       returnUrl: 'https://your-domain.com/success',
       cancelUrl: 'https://your-domain.com/cancel',
@@ -76,8 +54,6 @@ export class PayosService {
 
     const bankTransfer = this.bankTransferRepository.create({
       walletUserId,
-      accountNumber,
-      bankName,
       transferType: true,
       transferAmount: amount,
       transferDescription: description,
@@ -91,6 +67,39 @@ export class PayosService {
       message: 'Payment link created successfully',
       user,
       paymentLink,
+    };
+  }
+
+  // rút tiền qua payos (limited) web
+  async withdrawMoney(walletUserId: number, amount: number, bankName: string, accountNumber: number) {
+    const user = await this.userRepository.findOne({
+      where: { id: walletUserId },
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    if (user.walletBalance < amount) {
+      throw new Error('Insufficient funds');
+    }
+
+    const bankTransfer = this.bankTransferRepository.create({
+      walletUserId,
+      transferType: false,
+      bankName,
+      accountNumber,
+      transferAmount: amount,
+      transferDescription: `Rút tiền từ tài khoản ${walletUserId}`,
+      transferDate: new Date(),
+      status: false,
+    });
+
+    await this.bankTransferRepository.save(bankTransfer);
+
+    return {
+      message: 'Withdrawal request created successfully',
+      user,
     };
   }
 
@@ -108,10 +117,7 @@ export class PayosService {
       bankTransfer.status = true;
       await this.bankTransferRepository.save(bankTransfer);
 
-      // Đảm bảo walletBalance là kiểu số trước khi cộng
-      bankTransfer.user.walletBalance =
-        parseFloat(bankTransfer.user.walletBalance.toString()) +
-        bankTransfer.transferAmount;
+      bankTransfer.user.walletBalance = bankTransfer.user.walletBalance + bankTransfer.transferAmount;
       await this.userRepository.save(bankTransfer.user);
 
       return {
@@ -126,4 +132,7 @@ export class PayosService {
   async getAllTransactions() {
     return await this.bankTransferRepository.find({ relations: ['user'] });
   }
+
+
+
 }

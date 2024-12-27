@@ -5,42 +5,34 @@ import { PayosService } from './payos.service';
 export class PayosController {
   constructor(private readonly payosService: PayosService) {}
 
-  // @Post('topup')
-  // async topUp(@Body() body: { walletUserId: number; amount: number }) {
-  //   const { walletUserId, amount } = body;
-
-  //   if (!walletUserId || walletUserId <= 0) {
-  //     throw new BadRequestException('Invalid walletUserId');
-  //   }
-
-  //   if (!amount || amount <= 0) {
-  //     throw new BadRequestException('Invalid amount');
-  //   }
-
-  //   try {
-  //     const paymentLink = await this.payosService.createPayment(
-  //       amount,
-  //       `Nạp tiền vào tài khoản ${walletUserId}`,
-  //     );
-  //     return { paymentLink };
-  //   } catch (error) {
-  //     console.error('Error during top-up:', error);
-  //     throw new Error('Unable to top-up account. Please try again later.');
-  //   }
-  // }
-
   @Post('topup')
   async topUp(
-    @Body() body: { walletUserId: number; amount: number; accountNumber: number; bankName: string; description: string }
+    @Body() body: { walletUserId: number; amount: number; description: string }
   ) {
-    const { walletUserId, amount, accountNumber, bankName, description } = body;
+    const { walletUserId, amount, description } = body;
 
     try {
-      const result = await this.payosService.topUp(walletUserId, amount, accountNumber, bankName, description);
+      const result = await this.payosService.topUp(walletUserId, amount, description);
       return result;
     } catch (error) {
       console.error('Error during top-up:', error);
       throw new Error('Unable to top-up account. Please try again later.');
+    }
+  }
+
+  // bug: withdrawMoney is not defined
+  @Post('withdraw')
+  async withdraw(
+    @Body() body: { walletUserId: number; amount: number; bankName: string; accountNumber: number }
+  ) {
+    const { walletUserId, amount, bankName, accountNumber } = body;
+
+    try {
+      const result = await this.payosService.withdrawMoney(walletUserId, amount, bankName, accountNumber);
+      return result;
+    } catch (error) {
+      console.error('Error during withdrawal:', error);
+      throw new Error('Unable to withdraw funds. Please try again later.');
     }
   }
 

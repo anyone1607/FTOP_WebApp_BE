@@ -77,18 +77,19 @@ export class UserService {
     if (!user) {
       throw new HttpException('Email is not exist', HttpStatus.BAD_REQUEST);
     }
-    const checkPass = bcrypt.compare(loginUserDto.password, user.password);
+    const checkPass = await bcrypt.compare(loginUserDto.password, user.password);
     if (!checkPass) {
       throw new HttpException(
         'Password is not correct',
         HttpStatus.BAD_REQUEST,
       );
     }
-    // generate access_token and refresh_token
     const payload = { id: user.id, email: user.email };
     return this.generateToken(payload);
   }
-
+  
+  
+  
   async refreshToken(refresh_token: string): Promise<any> {
     try {
       const verify = await this.jwtService.verify(refresh_token, {
@@ -127,6 +128,7 @@ export class UserService {
     );
     return { access_token, refresh_token };
   }
+  
 
   private async hashPassword(password: string): Promise<string> {
     const saltOrRounds = 10;

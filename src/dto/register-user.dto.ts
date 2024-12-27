@@ -37,6 +37,9 @@ export class CreateUserDto {
   phoneNumber?: string;
 
   @IsNotEmpty()
+  @Matches(/^[0-9]{6}$/, {
+    message: 'Mã PIN phải gồm 6 chữ số',
+  })
   pin?: number;
 
   @IsString()

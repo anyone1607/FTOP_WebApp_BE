@@ -12,19 +12,19 @@ export class BankTransfer {
   @JoinColumn({ name: 'walletUserId' })  
   user: User;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true }) // có thể null
   accountNumber: number;
 
-  @Column({ length: 50, nullable: false })
+  @Column({ length: 50, nullable: true }) // có thể null
   bankName: string;
 
   @Column({ nullable: false })
-  transferType: boolean;
+  transferType: boolean; // withdraw: false, topup: true
 
-  @Column('decimal', { precision: 10, scale: 2, nullable: false })
+  @Column({ nullable: false })
   transferAmount: number;
 
-  @Column({ length: 100 })
+  @Column({ length: 100 }) // có thể null
   transferDescription: string;
 
   @Column({ nullable: false })
