@@ -28,7 +28,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       avatar: profile.photos?.[1]?.value || profile.photos?.[0]?.value || null,
       phoneNumber: null,
       role: 'owner',
-      password: null,
+      password: '',
       walletBalance: 0,
       isActive: true,
     });

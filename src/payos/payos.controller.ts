@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post } from '@nestjs/common';
 import { PayosService } from './payos.service';
+import { HttpStatus } from 'src/global/globalEnum';
 
 @Controller('payos')
 export class PayosController {
@@ -21,20 +22,20 @@ export class PayosController {
   }
 
   // bug: withdrawMoney is not defined
-  @Post('withdraw')
-  async withdraw(
-    @Body() body: { walletUserId: number; amount: number; bankName: string; accountNumber: number }
-  ) {
-    const { walletUserId, amount, bankName, accountNumber } = body;
+  // @Post('withdraw')
+  // async withdraw(
+  //   @Body() body: { walletUserId: number; amount: number; bankName: string; accountNumber: number }
+  // ) {
+  //   const { walletUserId, amount, bankName, accountNumber } = body;
 
-    try {
-      const result = await this.payosService.withdrawMoney(walletUserId, amount, bankName, accountNumber);
-      return result;
-    } catch (error) {
-      console.error('Error during withdrawal:', error);
-      throw new Error('Unable to withdraw funds. Please try again later.');
-    }
-  }
+  //   try {
+  //     const result = await this.payosService.withdrawMoney(walletUserId, amount, bankName, accountNumber);
+  //     return result;
+  //   } catch (error) {
+  //     console.error('Error during withdrawal:', error);
+  //     throw new Error('Unable to withdraw funds. Please try again later.');
+  //   }
+  // }
 
   @Post('update-transaction-status')
   async updateTransactionStatus(@Body() body: { transferId: number; status: boolean }) {
@@ -58,6 +59,25 @@ export class PayosController {
       console.error('Error fetching transactions:', error);
       throw new Error('Unable to fetch transactions. Please try again later.');
     }
+  }
+
+  @Post()
+  async withdraw(@Body() body: any) {
+    const { walletUserId, amount, bankName, accountNumber } = body;
+
+    if (!walletUserId || !amount || !bankName || !accountNumber) {
+      throw new HttpException(
+        'Thông tin không đầy đủ, vui lòng kiểm tra lại.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return await this.payosService.withdraw(
+      walletUserId,
+      amount,
+      bankName,
+      accountNumber,
+    );
   }
 
 }

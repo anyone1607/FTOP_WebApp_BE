@@ -129,7 +129,31 @@ export class StoreService {
   }
 
   // hàm tính toán 6 tháng gần nhất
-  private getLast6Months(): string[] {
+  // private getLast6Months(): string[] {
+  //   const months = [
+  //     'Jan',
+  //     'Feb',
+  //     'Mar',
+  //     'Apr',
+  //     'May',
+  //     'Jun',
+  //     'Jul',
+  //     'Aug',
+  //     'Sep',
+  //     'Oct',
+  //     'Nov',
+  //     'Dec',
+  //   ];
+  //   const currentMonth = new Date().getMonth();
+  //   const last6Months = [];
+  //   for (let i = 5; i >= 0; i--) {
+  //     const monthIndex = (currentMonth - i + 12) % 12;
+  //     last6Months.push(months[monthIndex]);
+  //   }
+  //   return last6Months;
+  // }
+
+  private getLast6Months(): { month: string; year: number }[] {
     const months = [
       'Jan',
       'Feb',
@@ -144,12 +168,21 @@ export class StoreService {
       'Nov',
       'Dec',
     ];
-    const currentMonth = new Date().getMonth();
+    const currentDate = new Date();
     const last6Months = [];
+
     for (let i = 5; i >= 0; i--) {
-      const monthIndex = (currentMonth - i + 12) % 12;
-      last6Months.push(months[monthIndex]);
+      const date = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() - i,
+        1,
+      );
+      last6Months.push({
+        month: months[date.getMonth()],
+        year: date.getFullYear(),
+      });
     }
+
     return last6Months;
   }
 
@@ -157,23 +190,21 @@ export class StoreService {
     const labels = this.getLast6Months();
     const salesData = [];
 
-    for (const month of labels) {
-      const monthIndex =
-        new Date(`${month} 1, ${new Date().getFullYear()}`).getMonth() + 1;
+    for (const { month, year } of labels) {
+      const monthIndex = new Date(`${month} 1, ${year}`).getMonth() + 1;
 
       const totalProducts = await this.orderRepository
         .createQueryBuilder('order')
         .where('order.storeId = :storeId', { storeId })
         .andWhere('order.orderStatus = :status', { status: true })
         .andWhere('MONTH(order.orderDate) = :month', { month: monthIndex })
-        .andWhere('YEAR(order.orderDate) = :year', {
-          year: new Date().getFullYear(),
-        })
-        .select('COUNT(order.orderId)', 'count') // Đếm số lượng đơn hàng
+        .andWhere('YEAR(order.orderDate) = :year', { year })
+        .select('COUNT(order.orderId)', 'count')
         .getRawOne();
 
       salesData.push(Number(totalProducts.count) || 0);
     }
+
     return salesData;
   }
 
@@ -181,23 +212,21 @@ export class StoreService {
     const labels = this.getLast6Months();
     const salesData = [];
 
-    for (const month of labels) {
-      const monthIndex = new Date(`${month} 1, ${new Date().getFullYear()}`).getMonth() + 1;
+    for (const { month, year } of labels) {
+      const monthIndex = new Date(`${month} 1, ${year}`).getMonth() + 1;
 
       const totalSales = await this.orderRepository
         .createQueryBuilder('order')
         .where('order.storeId = :storeId', { storeId })
         .andWhere('order.orderStatus = :status', { status: true })
         .andWhere('MONTH(order.orderDate) = :month', { month: monthIndex })
-        .andWhere('YEAR(order.orderDate) = :year', { year: new Date().getFullYear() })
+        .andWhere('YEAR(order.orderDate) = :year', { year })
         .select('SUM(order.totalPrice)', 'total')
         .getRawOne();
 
       salesData.push(Number(totalSales.total) || 0);
     }
+
     return salesData;
   }
-
-
-
 }

@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import PayOS from '@payos/node';
 import { BankTransfer } from '../banktransfer/entities/banktransfer.entity';
 import { User } from '../user/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
+import { HttpStatus } from 'src/global/globalEnum';
 @Injectable()
 export class PayosService {
   private payos: any;
@@ -71,37 +72,37 @@ export class PayosService {
   }
 
   // rút tiền qua payos (limited) web
-  async withdrawMoney(walletUserId: number, amount: number, bankName: string, accountNumber: number) {
-    const user = await this.userRepository.findOne({
-      where: { id: walletUserId },
-    });
+  // async withdrawMoney(walletUserId: number, amount: number, bankName: string, accountNumber: number) {
+  //   const user = await this.userRepository.findOne({
+  //     where: { id: walletUserId },
+  //   });
 
-    if (!user) {
-      throw new Error('User not found');
-    }
+  //   if (!user) {
+  //     throw new Error('User not found');
+  //   }
 
-    if (user.walletBalance < amount) {
-      throw new Error('Insufficient funds');
-    }
+  //   if (user.walletBalance < amount) {
+  //     throw new Error('Insufficient funds');
+  //   }
 
-    const bankTransfer = this.bankTransferRepository.create({
-      walletUserId,
-      transferType: false,
-      bankName,
-      accountNumber,
-      transferAmount: amount,
-      transferDescription: `Rút tiền từ tài khoản ${walletUserId}`,
-      transferDate: new Date(),
-      status: false,
-    });
+  //   const bankTransfer = this.bankTransferRepository.create({
+  //     walletUserId,
+  //     transferType: false,
+  //     bankName,
+  //     accountNumber,
+  //     transferAmount: amount,
+  //     transferDescription: `Rút tiền từ tài khoản ${walletUserId}`,
+  //     transferDate: new Date(),
+  //     status: false,
+  //   });
 
-    await this.bankTransferRepository.save(bankTransfer);
+  //   await this.bankTransferRepository.save(bankTransfer);
 
-    return {
-      message: 'Withdrawal request created successfully',
-      user,
-    };
-  }
+  //   return {
+  //     message: 'Withdrawal request created successfully',
+  //     user,
+  //   };
+  // }
 
   async updateTransactionStatus(transferId: number, status: boolean) {
     const bankTransfer = await this.bankTransferRepository.findOne({
@@ -133,6 +134,41 @@ export class PayosService {
     return await this.bankTransferRepository.find({ relations: ['user'] });
   }
 
+  async withdraw(walletUserId: number, amount: number, bankName: string, accountNumber: number) {
+    if(amount < 5000 || amount > 300000000) {
+      throw new HttpException('Số tiền rút phải từ 50,000 đến 300,000,000', HttpStatus.BAD_REQUEST);
+    }
+    const owner = await this.userRepository.findOne({
+      where: { id: walletUserId },
+    })
+    if(!owner) {
+      throw new HttpException('Người dùng không tồn tại', HttpStatus.NOT_FOUND);
+    }
+    if(owner.walletBalance < amount) {
+      throw new HttpException('Số dư không đủ để thực hiện giao dịch', HttpStatus.BAD_REQUEST);
+    }
+    if(owner.role === 'student') {
+      throw new HttpException('Người dùng không có quyền rút tiền', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    owner.walletBalance -= amount;
+    await this.userRepository.save(owner);
 
+    const bankTransfer = this.bankTransferRepository.create({
+      walletUserId: owner.id,
+      accountNumber: accountNumber ? Number(accountNumber) : null,
+      bankName: bankName || null,
+      transferType: false,
+      transferAmount: amount,
+      transferDescription: 'Giao dịch rút tiền từ ví người dùng',
+      transferDate: new Date(),
+      status: true,
+    });
+    await this.bankTransferRepository.save(bankTransfer);
+    return {
+      message: 'Rút tiền thành công',
+      balance: owner.walletBalance,
+      transaction: bankTransfer
+    }
+  }
 
 }
