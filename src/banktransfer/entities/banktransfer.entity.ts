@@ -24,7 +24,7 @@ export class BankTransfer {
   @Column({ nullable: false })
   transferAmount: number;
 
-  @Column({ length: 100 }) // có thể null
+  @Column({ length: 100, nullable: true }) // có thể null
   transferDescription: string;
 
   @Column({ nullable: false })

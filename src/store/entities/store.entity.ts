@@ -28,9 +28,9 @@ export class Store {
   // @Column()
   // ownerId: number;
 
-  @OneToOne(() => User, (user) => user.store)
-  @JoinColumn({ name: 'ownerId'})
-  owner: User;
+  @OneToOne(() => User, user => user.store)
+  @JoinColumn({ name: 'ownerId' })
+  user: User;
 
   @Column({ nullable: false })
   status: boolean;
@@ -44,5 +44,4 @@ export class Store {
 
   @OneToMany(() => Order, (order) => order.store)
   order: Order[];
-  
 }

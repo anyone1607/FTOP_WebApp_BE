@@ -61,7 +61,7 @@ export class PayosController {
     }
   }
 
-  @Post()
+  @Post('withdraw')
   async withdraw(@Body() body: any) {
     const { walletUserId, amount, bankName, accountNumber } = body;
 

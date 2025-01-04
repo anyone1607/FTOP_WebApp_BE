@@ -34,6 +34,11 @@ export class StoreController {
   findAll(): Promise<Store[]> {
     return this.storeService.findAll();
   }
+  // get a store by id
+  @Get(':id')
+  findOne(@Param('id') id: number): Promise<Store> {
+    return this.storeService.findOne(id);
+  }
   // get 4 new stores
   @Get('new')
   findNewStores(): Promise<Store[]> {
@@ -43,11 +48,6 @@ export class StoreController {
   @Get(':storeId')
   async getStoreDetail(@Param('storeId') storeId: number) {
     return this.storeService.getStoreWithProducts(storeId);
-  }
-  // get a store by id
-  @Get(':id')
-  findOne(@Param('id') id: number): Promise<Store> {
-    return this.storeService.findOne(id);
   }
   //update a store by id
   @Patch(':id')

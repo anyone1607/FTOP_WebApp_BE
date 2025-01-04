@@ -57,7 +57,7 @@ export class User {
   @OneToMany(() => BankTransfer, (bankTransfer) => bankTransfer.user)
   bankTransfers: BankTransfer[];
 
-  @OneToOne(() => Store, (store) => store.owner)
+  @OneToOne(() => Store, (store) => store.user)
   store: Store;
   
 }

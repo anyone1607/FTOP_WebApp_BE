@@ -31,11 +31,7 @@ export class PayosService {
   }
 
   // nạp tiền qua payos (limited)
-  async topUp(
-    walletUserId: number,
-    amount: number,
-    description: string,
-  ) {
+  async topUp(walletUserId: number, amount: number, description: string) {
     const user = await this.userRepository.findOne({
       where: { id: walletUserId },
     });
@@ -43,7 +39,6 @@ export class PayosService {
     if (!user) {
       throw new Error('User not found');
     }
-
 
     const paymentLink = await this.payos.createPaymentLink({
       amount,
@@ -118,7 +113,8 @@ export class PayosService {
       bankTransfer.status = true;
       await this.bankTransferRepository.save(bankTransfer);
 
-      bankTransfer.user.walletBalance = bankTransfer.user.walletBalance + bankTransfer.transferAmount;
+      bankTransfer.user.walletBalance =
+        bankTransfer.user.walletBalance + bankTransfer.transferAmount;
       await this.userRepository.save(bankTransfer.user);
 
       return {
@@ -134,23 +130,85 @@ export class PayosService {
     return await this.bankTransferRepository.find({ relations: ['user'] });
   }
 
-  async withdraw(walletUserId: number, amount: number, bankName: string, accountNumber: number) {
-    if(amount < 5000 || amount > 300000000) {
-      throw new HttpException('Số tiền rút phải từ 50,000 đến 300,000,000', HttpStatus.BAD_REQUEST);
+  // async withdraw(walletUserId: number, amount: number, bankName: string, accountNumber: number) {
+  //   if(amount < 5000 || amount > 300000000) {
+  //     throw new HttpException('Số tiền rút phải từ 50,000 đến 300,000,000', HttpStatus.BAD_REQUEST);
+  //   }
+  //   const owner = await this.userRepository.findOne({
+  //     where: { id: walletUserId },
+  //   })
+
+  //   if(!owner) {
+  //     throw new HttpException('Người dùng không tồn tại', HttpStatus.NOT_FOUND);
+  //   }
+  //   if(owner.walletBalance < amount) {
+  //     throw new HttpException('Số dư không đủ để thực hiện giao dịch', HttpStatus.BAD_REQUEST);
+  //   }
+  //   if(owner.role !== 'owner') {
+  //     throw new HttpException('Người dùng không có quyền rút tiền', HttpStatus.INTERNAL_SERVER_ERROR);
+  //   }
+
+  //   owner.walletBalance -= amount;
+  //   await this.userRepository.save(owner);
+
+  //   const bankTransfer = this.bankTransferRepository.create({
+  //     walletUserId: owner.id,
+  //     accountNumber: accountNumber ? Number(accountNumber) : null,
+  //     bankName: bankName || null,
+  //     transferType: false,
+  //     transferAmount: amount,
+  //     transferDescription: 'Giao dịch rút tiền từ ví người dùng',
+  //     transferDate: new Date(),
+  //     status: true,
+  //   });
+  //   await this.bankTransferRepository.save(bankTransfer);
+  //   return {
+  //     message: 'Rút tiền thành công',
+  //     balance: owner.walletBalance,
+  //     transaction: bankTransfer
+  //   }
+  // }
+
+  async withdraw(
+    walletUserId: number,
+    amount: number,
+    bankName: string,
+    accountNumber: number,
+  ) {
+    if (amount < 5000 || amount > 300000000) {
+      throw new HttpException(
+        ['Số tiền rút phải từ 50,000 đến 300,000,000'],
+        HttpStatus.BAD_REQUEST,
+      );
     }
+
     const owner = await this.userRepository.findOne({
       where: { id: walletUserId },
-    })
-    if(!owner) {
-      throw new HttpException('Người dùng không tồn tại', HttpStatus.NOT_FOUND);
+    });
+
+    if (!owner) {
+      throw new HttpException(
+        ['Người dùng không tồn tại'],
+        HttpStatus.NOT_FOUND,
+      );
     }
-    if(owner.walletBalance < amount) {
-      throw new HttpException('Số dư không đủ để thực hiện giao dịch', HttpStatus.BAD_REQUEST);
+
+    const errors = [];
+    if (owner.walletBalance < amount) {
+      errors.push('Số dư không đủ để thực hiện giao dịch');
     }
-    if(owner.role === 'student') {
-      throw new HttpException('Người dùng không có quyền rút tiền', HttpStatus.INTERNAL_SERVER_ERROR);
+    if (owner.role !== 'owner') {
+      errors.push('Người dùng không có quyền rút tiền');
     }
+
+    if (errors.length > 0) {
+      throw new HttpException(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    // owner.walletBalance -= amount;
+    console.log('Số dư ban đầu:', owner.walletBalance);
     owner.walletBalance -= amount;
+    console.log('Số dư sau khi trừ:', owner.walletBalance);
     await this.userRepository.save(owner);
 
     const bankTransfer = this.bankTransferRepository.create({
@@ -163,12 +221,19 @@ export class PayosService {
       transferDate: new Date(),
       status: true,
     });
-    await this.bankTransferRepository.save(bankTransfer);
+
+    const savedTransfer = await this.bankTransferRepository.save(bankTransfer);
+    if (!savedTransfer) {
+      throw new HttpException(
+        ['Lỗi lưu giao dịch, vui lòng thử lại sau'],
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
     return {
       message: 'Rút tiền thành công',
       balance: owner.walletBalance,
-      transaction: bankTransfer
-    }
+      transaction: savedTransfer,
+    };
   }
-
 }
