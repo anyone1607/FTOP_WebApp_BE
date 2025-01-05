@@ -3,10 +3,12 @@ import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as session from 'express-session';
 import * as passport from 'passport';
-import { join } from 'path'; // Import join để xử lý đường dẫn
-import * as express from 'express'; // Import express
+import { join } from 'path';
+import { ValidationPipe } from '@nestjs/common';
+import * as express from 'express';
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);  
+  const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
   app.setGlobalPrefix('api');
   app.use(session({
@@ -17,7 +19,6 @@ async function bootstrap() {
       maxAge: 60000,
     }
   }))
-  
   app.use(passport.initialize());
   app.use(passport.session());
   // Cấu hình thư mục tĩnh
@@ -26,7 +27,7 @@ async function bootstrap() {
   // app.use('/uploads/products', express.static(path.join(__dirname, '..', 'uploads/products')));
   // console.log('Serving static assets from:', join(__dirname, '..', 'uploads/products'));
   app.use(
-    '/uploads/products',
+    '/uploads/products',  
     express.static(path.join(__dirname, '..', '..', 'uploads/products'))
   );
   app.use(

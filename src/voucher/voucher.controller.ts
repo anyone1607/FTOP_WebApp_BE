@@ -1,8 +1,8 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
+  Post,
   Patch,
   Param,
   Delete,
@@ -10,9 +10,16 @@ import {
 } from '@nestjs/common';
 import { VoucherService } from './voucher.service';
 import { Voucher } from './entities/voucher.entity';
+
 @Controller('voucher')
 export class VoucherController {
   constructor(private readonly voucherService: VoucherService) { }
+
+  // android
+  // @Get()
+  // async findAll(@Query('userId') userId: number, @Query('role') role: string): Promise<Voucher[]> {
+  //   return this.voucherService.findAll(userId, role);
+  // }
 
   @Get()
   async findAll(@Query('userId') userId: number, @Query('role') role: string): Promise<Voucher[]> {
@@ -42,11 +49,11 @@ export class VoucherController {
     return this.voucherService.filter(filter, minDiscount, maxDiscount, userId, role);
   }
 
+  
   @Get(':id')
   findOne(@Param('id') id: number): Promise<Voucher> {
     return this.voucherService.findOne(id);
   }
-
 
   @Patch(':id')
   update(
@@ -78,8 +85,10 @@ export class VoucherController {
     return this.voucherService.permanentlyDelete(id);
   }
 
-
-
-
+  // http://localhost:8000/api/voucher/store/{storeId}
+  @Get('store/:storeId')
+  async getVouchersByStoreId(@Param('storeId') storeId: number): Promise<Voucher[]> {
+    return await this.voucherService.findByStoreId(+storeId);
+  }
 
 }

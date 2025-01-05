@@ -4,6 +4,7 @@ import { Voucher } from '../voucher/entities/voucher.entity';
 
 import { Repository, Like, Between } from 'typeorm';
 import { VoucherDetails } from 'src/utils/types';
+
 @Injectable()
 export class VoucherService {
   constructor(
@@ -20,12 +21,10 @@ export class VoucherService {
     const newVoucher = this.voucherRepository.create(details);
     return this.voucherRepository.save(newVoucher);
   }
-
   async create(voucherData: Partial<Voucher>): Promise<Voucher> {
     const voucher = this.voucherRepository.create(voucherData);
     return await this.voucherRepository.save(voucher);
   }
-
   async findOne(id: number): Promise<Voucher> {
     const voucher = await this.voucherRepository.findOne({
       where: { voucherId: id },
@@ -57,7 +56,6 @@ export class VoucherService {
       await this.voucherRepository.save(voucher);
     }
   }
-
 
   // list deleted voucher in trash
   async getDeletedVouchers(): Promise<Voucher[]> {
@@ -97,7 +95,7 @@ export class VoucherService {
 
 
   async findAll(userId: number, role: string): Promise<Voucher[]> {
-    if (role === 'store-owner') {
+    if (role === 'owner') {
       return this.voucherRepository.find({
         where: { isDeleted: false, store: { ownerId: userId } },
         relations: ['store'],
@@ -123,11 +121,20 @@ export class VoucherService {
       queryBuilder.andWhere('voucher.voucherDiscount BETWEEN :minDiscount AND :maxDiscount', { minDiscount: parseInt(minDiscount), maxDiscount: parseInt(maxDiscount) });
     }
 
-    if (role === 'store-owner') {
+    if (role === 'owner') {
       queryBuilder.andWhere('store.ownerId = :userId', { userId });
     }
 
     const vouchers = await queryBuilder.getMany();
     return vouchers;
   }
+
+  // Get voucher by storeId (android)
+  async findByStoreId(storeId: number): Promise<Voucher[]> {
+    return await this.voucherRepository.find({
+      where: { store: { storeId }, isDeleted: false },
+      relations: ['store'],
+    });
+  }
+  
 }

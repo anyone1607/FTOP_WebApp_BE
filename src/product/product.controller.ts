@@ -88,49 +88,46 @@ export class ProductController {
 
   
   @Post()
-@UseInterceptors(
-  FileInterceptor('productImage', {
-    storage: diskStorage({
-      destination: './uploads/products',
-      filename: (req, file, callback) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const ext = extname(file.originalname);
-        callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
-      },
+  @UseInterceptors(
+    FileInterceptor('productImage', {
+      storage: diskStorage({
+        destination: './uploads/products',
+        filename: (req, file, callback) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+        },
+      }),
     }),
-  }),
-)
-async createProduct(
-  @Body(new ValidationPipe({ transform: true })) productDto: ProductDto,
-  @UploadedFile() file: Express.Multer.File,
-): Promise<ResponseData<Product>> {
-    // Log dữ liệu từ body
-    console.log("Request Body:", productDto);
-
-    // Log file nhận được
-    console.log("Uploaded File:", file);
-  try {
-    if (file) {
-      productDto.productImage = `/uploads/products/${file.filename}`;
+  )
+  async createProduct(
+    @Body(new ValidationPipe({ transform: true })) productDto: ProductDto,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<ResponseData<Product>> {
+      // Log dữ liệu từ body
+      console.log("Request Body:", productDto);
+  
+      // Log file nhận được
+      console.log("Uploaded File:", file);
+    try {
+      if (file) {
+        productDto.productImage = `/uploads/products/${file.filename}`;
+      }
+      const createdProduct = await this.productService.createProduct(productDto);
+      return new ResponseData<Product>(
+        createdProduct,
+        HttpStatus.OK,
+        HttpMessage.OK,
+      );
+    } catch (error) {
+      console.error(error);
+      return new ResponseData<Product>(
+        null,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        HttpMessage.INTERNAL_SERVER_ERROR,
+      );
     }
-    const createdProduct = await this.productService.createProduct(productDto);
-    return new ResponseData<Product>(
-      createdProduct,
-      HttpStatus.OK,
-      HttpMessage.OK,
-    );
-  } catch (error) {
-    console.error(error);
-    return new ResponseData<Product>(
-      null,
-      HttpStatus.INTERNAL_SERVER_ERROR,
-      HttpMessage.INTERNAL_SERVER_ERROR,
-    );
   }
-}
-
-
-
 
   @Get('/:id')
   async detailProduct(@Param('id') id: number): Promise<ResponseData<Product>> {
@@ -147,30 +144,11 @@ async createProduct(
     }
   }
 
-  // @Put('/:id')
-  // async updateProduct(
-  //   @Body() productDto: ProductDto,
-  //   @Param('id') id: number,
-  // ): Promise<ResponseData<Product>> {
-  //   try {
-  //     const updatedProduct = await this.productService.updateProduct(
-  //       productDto,
-  //       id,
-  //     );
-  //     return new ResponseData<Product>(
-  //       updatedProduct,
-  //       HttpStatus.OK,
-  //       HttpMessage.OK,
-  //     );
-  //   } catch (error) {
-  //     console.error(error);
-  //     return new ResponseData<Product>(
-  //       null,
-  //       HttpStatus.INTERNAL_SERVER_ERROR,
-  //       HttpMessage.INTERNAL_SERVER_ERROR,
-  //     );
-  //   }
-  // }
+  @Get('store/:storeId')
+  async getProductsByStoreId(@Param('storeId') storeId: string): Promise<Product[]> {
+    return this.productService.getProductsByStoreId(Number(storeId));
+  }
+
   @Put('/:id')
 @UseInterceptors(
   FileInterceptor('productImage', {
@@ -216,6 +194,7 @@ async updateProduct(
     );
   }
 }
+
 
   @Delete('/:id')
   async deleteProduct(@Param('id') id: number): Promise<ResponseData<boolean>> {

@@ -4,11 +4,11 @@ import { Store } from "../store/entities/store.entity";
 
 export class ProductDto {
     productId?: number;
-    @MinLength(16, { message: "Product name must be at least 16 characters long." })
+    @MinLength(4, { message: "Product name must be at least 4 characters long." })
     productName?: string;
     productPrice?: number;
     @IsNotEmpty({ message: "Category id is required." })
-    categoryId?: number;
+    categoryId?: number;    
     category?: Category; 
     status?: boolean;
     storeId?: number

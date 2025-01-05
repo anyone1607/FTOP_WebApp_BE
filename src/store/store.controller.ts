@@ -92,6 +92,11 @@ export class StoreController {
   findAll(): Promise<Store[]> {
     return this.storeService.findAll();
   }
+  // get 4 new stores
+  @Get('new')
+  findNewStores(): Promise<Store[]> {
+    return this.storeService.findLatestedStores();
+  }
   // get a store by id
   @Get(':id')
   findOne(@Param('id') id: number): Promise<Store> {

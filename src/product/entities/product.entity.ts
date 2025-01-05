@@ -19,7 +19,7 @@ export class Product {
   category: Category;
 
   @Column({ nullable: false })
-  categoryId: number;  // categoryId là khóa ngoại
+  categoryId: number;
 
   @Column({ nullable: false })
   status: boolean;

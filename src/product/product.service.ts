@@ -24,7 +24,7 @@ export class ProductService {
     //   });
     // }
     async getProducts(userId: number, role: string): Promise<Product[]> {
-      if (role === 'store-owner') {
+      if (role === 'owner') {
         return this.productRepository.find({
           where: { isDeleted: false, store: { ownerId: userId } },
           relations: ['category', 'store'],
@@ -74,12 +74,12 @@ export class ProductService {
       console.log("Updated Product from DB:", updatedProduct); // Log kết quả sau khi lấy từ database
       return updatedProduct;
     }
+
     
     async deleteProduct(id: number): Promise<boolean> {
       const result = await this.productRepository.delete(id);
       return result.affected > 0;
     }
-
     async softDelete(id: number): Promise<void> {
       const product = await this.productRepository.findOne({ where: { productId: id }, relations: ['store'] });
       if (product) {
@@ -87,6 +87,13 @@ export class ProductService {
         product.deletedAt = new Date();
         await this.productRepository.save(product);
       }
+    }
+
+    // Get products by storeId (android)
+    async getProductsByStoreId(storeId: number): Promise<Product[]> {
+      return this.productRepository.find({
+        where: { storeId },
+      });
     }
     // async filterProducts(filter?: string, categoryName?: string, storeName?: string): Promise<Product[]> {
     //   const queryBuilder = this.productRepository.createQueryBuilder('product')

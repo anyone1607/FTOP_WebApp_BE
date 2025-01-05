@@ -23,7 +23,7 @@ export class Order {
   @Column({ nullable: false })
   orderDate: Date;
 
-  @ManyToOne(() => Voucher, voucher => voucher.order)
+  @ManyToOne(() => Voucher, voucher => voucher.order, { nullable: true })
   @JoinColumn({ name: 'voucherId' })
   voucher: Voucher;
 
