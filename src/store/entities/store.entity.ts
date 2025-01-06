@@ -20,10 +20,14 @@ export class Store {
   @Column()
   ownerId: number;  // Thêm cột 'ownerId' làm khóa ngoại
 
-  @OneToOne(() => User, (user) => user.store)  // Liên kết ngược lại từ Store sang User
-  @JoinColumn({ name: 'ownerId' })  // Chỉ định khóa ngoại là 'ownerId'
-  owner: User;  // Liên kết với User
+  
+  // @OneToOne(() => User, user => user.store)
+  // @JoinColumn({ name: 'ownerId' })
+  // user: User;
 
+@OneToOne(() => User, (user) => user.store)
+  @JoinColumn({ name: 'ownerId' })
+  owner: User;
 
   @Column({ nullable: false })
   status: boolean;
@@ -36,5 +40,4 @@ export class Store {
 
   @OneToMany(() => Order, (order) => order.store)
   order: Order[];
-  
 }

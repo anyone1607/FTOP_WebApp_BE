@@ -13,6 +13,6 @@ export class BanktransferController {
   @Get(':walletUserId')
   async getBankTransfersByUserId(@Param('walletUserId') walletUserId: number) {
     return this.bankTransferService.findTransfersByUserId(walletUserId);
-  }
-
+  } 
+  
 }

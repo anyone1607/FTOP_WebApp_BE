@@ -18,10 +18,8 @@ import { StoreModule } from './store/store.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { VoucherModule } from './voucher/voucher.module';
 import { JwtModule } from '@nestjs/jwt';
-import { ZalopayModule } from './zalopay/zalopay.module';
-// import { MailerModule } from '@nestjs-modules/mailer';
-// import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-// import { join } from 'path';
+import { ConfigModule } from '@nestjs/config';
+import { PayosModule } from './payos/payos.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot(dataSourceOptions),
@@ -41,33 +39,13 @@ import { ZalopayModule } from './zalopay/zalopay.module';
       secret: 'your-secret-key',
       signOptions: { expiresIn: '60s' },
     }),
-    ZalopayModule,
-    // MailerModule.forRoot({
-    //   transport: {
-    //     host: 'smtp.example.com',
-    //     port: 587,
-    //     auth: {
-    //       user: 'ftop@gmail.com',
-    //       pass: '123456789',
-    //     },
-    //   },
-    //   defaults: {
-    //     from: '"No Reply" <no-reply@example.com>',
-    //   },
-    //   template: {
-    //     dir: join(__dirname, 'templates'),
-    //     adapter: new HandlebarsAdapter(), // npm install handlebars
-    //     options: {
-    //       strict: true,
-    //     },
-    //   },
-    // }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+    PayosModule,
   ],
-  controllers: [
-    AppController,
-    AuthController,
-    ReviewController,
-  ],
+  controllers: [AppController, AuthController, ReviewController],
   providers: [AppService],
 })
 export class AppModule {}
