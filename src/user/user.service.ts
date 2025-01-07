@@ -200,15 +200,15 @@ export class UserService {
 
     if (existingUser) {
       const errors = [];
-    
+
       if (existingUser.email === email) {
         errors.push('Email already exists');
       }
-    
+
       if (existingUser.phoneNumber === phoneNumber) {
         errors.push('Phone number already exists');
       }
-    
+
       if (errors.length > 0) {
         throw new ConflictException(errors);
       }
@@ -229,20 +229,26 @@ export class UserService {
   }
 
   // login user with email and password (android)
-// async loginUser(loginUserDto: LoginUserDto): Promise<any> {
-//     const user = await this.userRepository.findOne({ where: { email: loginUserDto.email } });
-//     if(!user) {
-//       throw new HttpException('Email is not exist', HttpStatus.BAD_REQUEST);
-//     }
-//     const checkPass = await bcrypt.compareSync(loginUserDto.password, user.password);
-//     if(!checkPass) {
-//       throw new HttpException('Password is not correct', HttpStatus.BAD_REQUEST);
-//     }
-//     // generate access_token and refresh_token
-//     const payload = { id: user.id, email: user.email };
-//     return this.generateToken(payload);
-//   }
-
+  // async loginUser(loginUserDto: LoginUserDto): Promise<any> {
+  //   const user = await this.userRepository.findOne({
+  //     where: { email: loginUserDto.emailOrPhone },
+  //   });
+  //   if (!user) {
+  //     throw new HttpException('Email is not exist', HttpStatus.BAD_REQUEST);
+  //   }
+  //   const checkPass = await bcrypt.compare(loginUserDto.password, user.password);
+  //   if (!checkPass) {
+  //     throw new HttpException(
+  //       'Password is not correct',
+  //       HttpStatus.BAD_REQUEST,
+  //     );
+  //   }
+  //   const payload = { id: user.id, email: user.email };
+  //   return this.generateToken(payload);
+  // }
+  
+  
+  
   async refreshToken(refresh_token: string): Promise<any> {
     try {
       const verify = await this.jwtService.verify(refresh_token, { secret: 'refresh_token_secret' });

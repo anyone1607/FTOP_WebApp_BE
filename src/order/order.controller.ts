@@ -97,18 +97,19 @@ async countTotalPriceOrder(
     return this.orderService.softDelete(orderId);
   }
 
+  @Get('stats/:storeId')
+  async getStoreStats(
+    @Param('storeId') storeId: number,
+    @Query('month') month: number,
+    @Query('year') year: number,
+  ): Promise<{ totalOrders: number; totalRevenue: number }> {
+    return this.orderService.getStoreStats(storeId, month, year);
+  }
 
-  // @Get('count-by-store')
-  // async getOrderCountByStore(
-  //   @Query('filterType') filterType: 'day' | 'month' | 'year',
-  //   @Query('filterValue') filterValue: string,
-  // ) {
-  //   return await this.orderService.getOrderCountByStore(
-  //     filterType,
-  //     filterValue,
-  //   );
-  // }
-
-
-  
+  @Post('cashout-month')
+  async cashOutMonth(@Body() body: { storeId: number; month: number; year: number }) {
+    const { storeId, month, year } = body;
+    const result = await this.orderService.cashOutMonth(storeId, month, year);
+    return result;
+  }
 }

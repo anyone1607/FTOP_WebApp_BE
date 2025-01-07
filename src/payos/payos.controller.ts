@@ -36,6 +36,12 @@ export class PayosController {
   //     throw new Error('Unable to withdraw funds. Please try again later.');
   //   }
   // }
+  // https://9f69-118-68-122-42.ngrok-free.app/api/payos/receive-hook
+  @Post('receive-hook')
+  async handleWebhook(@Body() body: any): Promise<void> {
+    console.log(body);
+    return;
+  }
 
   @Post('update-transaction-status')
   async updateTransactionStatus(@Body() body: { transferId: number; status: boolean }) {

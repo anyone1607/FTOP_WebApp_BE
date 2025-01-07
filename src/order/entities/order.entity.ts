@@ -35,6 +35,9 @@ export class Order {
 
   @Column({ default: false })
   isDeleted: boolean;
+
+  @Column({ default: false })
+  isCashedOut: boolean;
   
   @OneToMany(() => OrderItem, orderItem => orderItem.order) // Thêm quan hệ OneToMany
   orderItems: OrderItem[];
