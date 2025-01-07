@@ -21,7 +21,7 @@ export class Transaction {
   @Column({ nullable: false })
   transactionDate: Date;
 
-  @Column('decimal', { precision: 10, scale: 2 })
+  @Column({nullable: false})
   transactionAmount: number;
 
   @Column({ length: 100 })
@@ -41,4 +41,5 @@ export class Transaction {
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'receiveUserId' })
   receiveUser: User;
+  
 }

@@ -32,10 +32,13 @@ export class Store {
   @Column({ nullable: false })
   status: boolean;
 
-  @Column({ nullable: true, type: 'json' })
+
+
+  // filed array storeImage
+  @Column('json', { nullable: true })
   storeImage: string[];
 
-  @OneToMany(() => Voucher, voucher => voucher.store)
+  @OneToMany(() => Voucher, (voucher) => voucher.store)
   vouchers: Voucher[];
 
   @OneToMany(() => Order, (order) => order.store)

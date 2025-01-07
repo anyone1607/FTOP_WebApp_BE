@@ -8,6 +8,7 @@ import { Transaction } from 'src/transaction/entities/transaction.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Order,OrderItem,Transaction])],
   controllers: [OrderController],
-  providers: [OrderService]
+  providers: [OrderService],
+  exports: [OrderService],
 })
 export class OrderModule {}

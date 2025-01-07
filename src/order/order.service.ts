@@ -68,6 +68,14 @@ export class OrderService {
     return parseFloat(result.totalPrice || '0');
   }
 
+
+
+  // async findAll(): Promise<Order[]> {
+  //   return await this.orderRepository.find({
+  //     where: { isDeleted: false },
+  //     relations: ['user', 'store', 'voucher', 'orderItems'],
+  //   });
+  // }
   async findAll(userId: string, role: string): Promise<Order[]> {
     if (role === 'owner') {
       const ownerId = parseInt(userId, 10); // Chuyển đổi userId từ string sang number
@@ -147,6 +155,45 @@ export class OrderService {
   //   }
   //   return await queryBuilder.getRawMany();
   // }
+
+  async createOrder(
+    userId: number,
+    storeId: number,
+    voucherId: number | null,
+    note: string,
+    totalPrice: number,
+  ): Promise<Order> {
+    const user = await this.orderRepository.manager.findOne(User, { where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    const store = await this.orderRepository.manager.findOne(Store, { where: { storeId: storeId } });
+    if (!store) {
+      throw new NotFoundException(`Store with ID ${storeId} not found`);
+    }
+
+    let voucher = null;
+    if (voucherId !== null) {
+      voucher = await this.orderRepository.manager.findOne(Voucher, { where: { voucherId: voucherId } });
+      if (!voucher) {
+        throw new NotFoundException(`Voucher with ID ${voucherId} not found`);
+      }
+    }
+
+    const order = this.orderRepository.create({
+      user,
+      store,
+      voucher,
+      orderStatus: true,
+      orderDate: new Date(),
+      note,
+      totalPrice,
+      isDeleted: false,
+    });
+
+    return await this.orderRepository.save(order);
+  }
 
 
   //api tao don hang (android)

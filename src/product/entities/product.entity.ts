@@ -11,7 +11,7 @@ export class Product {
   @Column({ length: 50, nullable: false })
   productName: string;
 
-  @Column('decimal', { precision: 10, scale: 2, nullable: false })
+  @Column({nullable : false})
   productPrice: number;
 
   @ManyToOne(() => Category, (category) =>category.categoryId)

@@ -24,7 +24,7 @@ export class OrderItem {
   @Column({ nullable: false })
   quantity: number;
 
-  @Column('decimal', { precision: 10, scale: 2, nullable: false })
+  @Column({nullable: false })
   unitPrice: number;
 
   

@@ -1,4 +1,4 @@
-import { Controller, Get, Delete, Param, Query, Post, Body } from '@nestjs/common';
+import { Controller, Get, Delete, Param, Query, Body,Post } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { Order } from './entities/order.entity';
 @Controller('order')
@@ -57,6 +57,17 @@ async countTotalPriceOrder(
     return this.orderService.getStoreStats(storeId, month, year);
   }
 
+  @Post('create')
+  async createOrder(
+    @Body('userId') userId: number,
+    @Body('storeId') storeId: number,
+    @Body('voucherId') voucherId: number | null,
+    @Body('note') note: string,
+    @Body('totalPrice') totalPrice: number,
+  ): Promise<Order> {
+    return this.orderService.createOrder(userId, storeId, voucherId, note, totalPrice);
+  }
+
   @Get()
   async findAll(
     @Query('userId') userId: string,
@@ -98,4 +109,6 @@ async countTotalPriceOrder(
   //   );
   // }
 
+
+  
 }

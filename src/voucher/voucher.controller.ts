@@ -11,6 +11,7 @@ import {
 import { VoucherService } from './voucher.service';
 import { Voucher } from './entities/voucher.entity';
 
+
 @Controller('voucher')
 export class VoucherController {
   constructor(private readonly voucherService: VoucherService) { }
@@ -54,7 +55,7 @@ export class VoucherController {
   findOne(@Param('id') id: number): Promise<Voucher> {
     return this.voucherService.findOne(id);
   }
-
+  
   @Patch(':id')
   update(
     @Param('id') id: number,

@@ -50,7 +50,29 @@ async getProductsBySales(userId: string, role: string): Promise<any[]> {
     }),
   );
 
-  return result;
+ return result;
 }
+
+
+
+  async createOrderItems(
+    orderId: number,
+    products: { productId: number; quantity: number; price: number }[],
+  ): Promise<OrderItem[]> {
+    const orderItems: OrderItem[] = [];
+  
+    for (const product of products) {
+      const orderItem = this.orderItemRepository.create({
+        orderId,
+        productId: product.productId,
+        quantity: product.quantity,
+        unitPrice: product.price,
+      });
+      const savedOrderItem = await this.orderItemRepository.save(orderItem);
+      orderItems.push(savedOrderItem);
+    }
+  
+    return orderItems;
+  }
 
 }

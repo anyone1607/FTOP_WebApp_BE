@@ -77,6 +77,8 @@ export class StoreService {
     });
     return { store, products };
   }
+
+
   // Get one store by id
   async findOne(id: number): Promise<Store> {
     const store = await this.storeRepository.findOne({
@@ -158,7 +160,7 @@ export class StoreService {
       .addSelect('store.storeName', 'storeName')
       .addSelect('COUNT(order.orderId)', 'orderCount')
       .leftJoin('store.order', 'order');
-  
+
     if (filterType === 'day') {
       queryBuilder.where('DATE(order.orderDate) = :filterValue', {
         filterValue,
@@ -181,9 +183,9 @@ export class StoreService {
       const ownerId = parseInt(userId, 10);
       queryBuilder.andWhere('store.ownerId = :ownerId', { ownerId });
     }
-  
+
     queryBuilder.groupBy('store.storeId').addGroupBy('store.storeName');
-  
+
     return await queryBuilder.getRawMany();
   }
 

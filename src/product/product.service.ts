@@ -148,4 +148,12 @@ export class ProductService {
         storeName: product.store?.storeName,
       }));
     }
+
+    // // Get products by storeId (android)
+    // async getProductsByStoreId(storeId: number): Promise<Product[]> {
+    //   return this.productRepository.find({
+    //     where: { storeId },
+    //   });
+    // }
+
 }

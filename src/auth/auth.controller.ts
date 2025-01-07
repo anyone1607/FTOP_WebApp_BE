@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards, Req, Res } from '@nestjs/common';
 import { GoogleAuthGuard } from './utils/Guards';
 import { RolesGuard } from './utils/role.guard';
-import { Roles } from './utils/roles.decorator';
+// import { Roles } from './utils/roles.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
 import { UserDetails } from 'src/utils/types';
@@ -74,7 +74,6 @@ async googleRedirect(@Req() req: Request, @Res() res: Response) {
   // Bảo vệ route chỉ cho phép admin truy cập
   @Get('admin')
   @UseGuards(GoogleAuthGuard, RolesGuard)
-  @Roles('admin')
   adminEndpoint() {
     return { msg: 'Welcome Admin' };
   }
@@ -82,7 +81,6 @@ async googleRedirect(@Req() req: Request, @Res() res: Response) {
   // Bảo vệ route chỉ cho phép manager truy cập
   @Get('manager')
   @UseGuards(GoogleAuthGuard, RolesGuard)
-  @Roles('manager')
   managerEndpoint() {
     return { msg: 'Welcome Manager' };
   }

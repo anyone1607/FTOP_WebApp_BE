@@ -20,10 +20,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { RolesGuard } from 'src/auth/utils/role.guard';
-import { Roles } from 'src/auth/utils/roles.decorator';
+// import { Roles } from 'src/auth/utils/roles.decorator';
 
 @UseGuards(RolesGuard)
-@Roles('admin', 'manager') // Chỉ cho phép admin và manager truy cập
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}

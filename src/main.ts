@@ -8,12 +8,15 @@ import { ValidationPipe } from '@nestjs/common';
 import * as express from 'express';
 import { ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from './http-exception.filter';
+import * as path from 'path';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalFilters(new HttpExceptionFilter());
   const configService = app.get(ConfigService);
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
+  app.useGlobalFilters(new HttpExceptionFilter());
   app.setGlobalPrefix('api');
 
   app.use(

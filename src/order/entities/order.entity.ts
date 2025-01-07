@@ -30,7 +30,7 @@ export class Order {
   @Column({ length: 50 })
   note: string;
 
-  @Column('decimal', { precision: 10, scale: 2, nullable: false })
+  @Column({ nullable: false })
   totalPrice: number;
 
   @Column({ default: false })

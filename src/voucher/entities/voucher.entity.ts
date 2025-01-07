@@ -9,7 +9,7 @@ export class Voucher {
   @Column({ length: 50, nullable: false })
   voucherName: string;
 
-  @Column('decimal', { precision: 10, scale: 2, nullable: false })
+  @Column({nullable: false })
   voucherDiscount: number;
 
   @ManyToOne(() => Store, store => store.vouchers, { nullable: false })
