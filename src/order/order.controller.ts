@@ -6,16 +6,22 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) { }
 
   @Get('countOrder')
-  async countTotalOrders(): Promise<{ totalOrders: number }> {
-    const totalOrders = await this.orderService.countTotalOrders();
-    return { totalOrders };
-  }
+async countTotalOrders(
+  @Query('userId') userId: string,
+  @Query('role') role: string
+): Promise<{ totalOrders: number }> {
+  const totalOrders = await this.orderService.countTotalOrders(userId, role);
+  return { totalOrders };
+}
 
-  @Get('countPrice')
-  async countTotalPriceOrder(): Promise<{ totalPrice: number }> {
-    const totalPrice = await this.orderService.countTotalPriceOrder();
-    return { totalPrice };
-  }
+@Get('countPrice')
+async countTotalPriceOrder(
+  @Query('userId') userId: string,
+  @Query('role') role: string
+): Promise<{ totalPrice: number }> {
+  const totalPrice = await this.orderService.countTotalPriceOrder(userId, role);
+  return { totalPrice };
+}
 
   @Post('create-with-items')
   async createOrderWithItems(

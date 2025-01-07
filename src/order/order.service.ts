@@ -20,7 +20,15 @@ export class OrderService {
     private readonly transactionRepository: Repository<Transaction>,
   ) { }
 
-  async countTotalOrders(): Promise<number> {
+  async countTotalOrders(userId: string, role: string): Promise<number> {
+    if (role === 'owner') {
+      const ownerId = parseInt(userId, 10);
+      return await this.orderRepository.createQueryBuilder('order')
+        .innerJoin('order.store', 'store')
+        .where('store.ownerId = :ownerId', { ownerId })
+        .andWhere('order.orderStatus = :orderStatus', { orderStatus: true })
+        .getCount();
+    }
     return await this.orderRepository.count({
       where: { orderStatus: true },
     });
@@ -45,12 +53,18 @@ export class OrderService {
       totalRevenue: parseFloat(result.totalRevenue) || 0,
     };
   }
-  async countTotalPriceOrder(): Promise<number> {
-    const result = await this.orderRepository.createQueryBuilder('order')
+  async countTotalPriceOrder(userId: string, role: string): Promise<number> {
+    const queryBuilder = this.orderRepository.createQueryBuilder('order')
       .select('SUM(order.totalPrice)', 'totalPrice')
-      .where('order.orderStatus = :orderStatus', { orderStatus: true })
-      .getRawOne();
-
+      .where('order.orderStatus = :orderStatus', { orderStatus: true });
+  
+    if (role === 'owner') {
+      const ownerId = parseInt(userId, 10);
+      queryBuilder.innerJoin('order.store', 'store')
+        .andWhere('store.ownerId = :ownerId', { ownerId });
+    }
+  
+    const result = await queryBuilder.getRawOne();
     return parseFloat(result.totalPrice || '0');
   }
 

@@ -21,10 +21,13 @@ export class UserController {
   }
 
   @Get('countUser')
-  async getTotalUsers(): Promise<{ totalUsers: number }> {
-    const totalUsers = await this.usersService.countTotalUsers();
-    return { totalUsers };
-  }
+async getTotalUsers(
+  @Query('userId') userId: string,
+  @Query('role') role: string
+): Promise<{ totalUsers: number }> {
+  const totalUsers = await this.usersService.countTotalUsers(userId, role);
+  return { totalUsers };
+}
 
   @Get('findUser/:id')
   async findUser(@Param('id') id: number): Promise<User> {

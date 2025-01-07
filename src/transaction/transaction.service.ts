@@ -13,19 +13,25 @@ export class TransactionService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async countTotalTransactions(): Promise<number> {
+  async countTotalTransactions(userId: string, role: string): Promise<number> {
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
-
+  
     const endOfDay = new Date();
     endOfDay.setHours(23, 59, 59, 999);
-
-    return this.transactionRepository.count({
-      where: {
-        status: true,
-        transactionDate: Between(startOfDay, endOfDay),
-      },
-    });
+  
+    const queryBuilder = this.transactionRepository.createQueryBuilder('transaction')
+      .where('transaction.status = :status', { status: true })
+      .andWhere('transaction.transactionDate BETWEEN :startOfDay AND :endOfDay', { startOfDay, endOfDay });
+  
+    if (role === 'owner') {
+      const ownerId = parseInt(userId, 10);
+      queryBuilder.innerJoin('transaction.order', 'order')
+        .innerJoin('order.store', 'store')
+        .andWhere('store.ownerId = :ownerId', { ownerId });
+    }
+  
+    return await queryBuilder.getCount();
   }
 
   // list transaction userby receiveUserid

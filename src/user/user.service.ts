@@ -21,7 +21,14 @@ export class UserService {
     private bankTransferRepository: Repository<BankTransfer>,
   ) {}
 
-  async countTotalUsers(): Promise<number> {
+  async countTotalUsers(userId: string, role: string): Promise<number> {
+    if (role === 'owner') {
+      const ownerId = parseInt(userId, 10);
+      return await this.userRepository.createQueryBuilder('user')
+        .innerJoin('user.store', 'store')
+        .where('store.ownerId = :ownerId', { ownerId })
+        .getCount();
+    }
     return await this.userRepository.count();
   }
 

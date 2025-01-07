@@ -51,15 +51,19 @@ export class StoreController {
   }
 
   @Get('order-count')
-  async getOrderCountByStore(
-    @Query('filterType') filterType?: 'day' | 'month' | 'year',
-    @Query('filterValue') filterValue?: string,
-  ) {
-    return await this.storeService.getOrderCountByStore(
-      filterType,
-      filterValue,
-    );
-  }
+async getOrderCountByStore(
+  @Query('filterType') filterType?: 'day' | 'month' | 'year',
+  @Query('filterValue') filterValue?: string,
+  @Query('userId') userId?: string,
+  @Query('role') role?: string
+) {
+  return await this.storeService.getOrderCountByStore(
+    filterType,
+    filterValue,
+    userId,
+    role
+  );
+}
   // get all stores
   @Get()
   findAll(): Promise<Store[]> {

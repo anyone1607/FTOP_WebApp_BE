@@ -150,14 +150,15 @@ export class StoreService {
   async getOrderCountByStore(
     filterType?: 'day' | 'month' | 'year',
     filterValue?: string,
+    userId?: string,
+    role?: string
   ): Promise<any> {
-    const queryBuilder = this.storeRepository
-      .createQueryBuilder('store')
+    const queryBuilder = this.storeRepository.createQueryBuilder('store')
       .select('store.storeId', 'storeId')
       .addSelect('store.storeName', 'storeName')
       .addSelect('COUNT(order.orderId)', 'orderCount')
       .leftJoin('store.order', 'order');
-
+  
     if (filterType === 'day') {
       queryBuilder.where('DATE(order.orderDate) = :filterValue', {
         filterValue,
@@ -175,9 +176,14 @@ export class StoreService {
         filterValue,
       });
     }
-
+  
+    if (role === 'owner') {
+      const ownerId = parseInt(userId, 10);
+      queryBuilder.andWhere('store.ownerId = :ownerId', { ownerId });
+    }
+  
     queryBuilder.groupBy('store.storeId').addGroupBy('store.storeName');
-
+  
     return await queryBuilder.getRawMany();
   }
 

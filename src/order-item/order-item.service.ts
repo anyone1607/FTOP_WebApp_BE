@@ -22,28 +22,35 @@ export class OrderItemService {
 // ORDER BY 
 //     "totalSold" DESC;
 
-    async getProductsBySales(): Promise<any[]> {
-    const salesData = await this.orderItemRepository
-      .createQueryBuilder('orderItem')
-      .select('orderItem.productId', 'productId')
-      .addSelect('SUM(orderItem.quantity)', 'totalSold')
-      .groupBy('orderItem.productId')
-      .orderBy('totalSold', 'DESC')
-      .getRawMany();
+async getProductsBySales(userId: string, role: string): Promise<any[]> {
+  const queryBuilder = this.orderItemRepository.createQueryBuilder('orderItem')
+    .select('orderItem.productId', 'productId')
+    .addSelect('SUM(orderItem.quantity)', 'totalSold')
+    .groupBy('orderItem.productId')
+    .orderBy('totalSold', 'DESC');
 
-    const result = await Promise.all(
-      salesData.map(async (item) => {
-        const product = await this.orderItemRepository.findOne({
-          where: { productId: item.productId },
-        });
-        return {
-          product,
-          totalSold: item.totalSold,
-        };
-      }),
-    );
-
-    return result;
+  if (role === 'owner') {
+    const ownerId = parseInt(userId, 10);
+    queryBuilder.innerJoin('orderItem.order', 'order')
+      .innerJoin('order.store', 'store')
+      .where('store.ownerId = :ownerId', { ownerId });
   }
+
+  const salesData = await queryBuilder.getRawMany();
+
+  const result = await Promise.all(
+    salesData.map(async (item) => {
+      const product = await this.orderItemRepository.findOne({
+        where: { productId: item.productId },
+      });
+      return {
+        product,
+        totalSold: item.totalSold,
+      };
+    }),
+  );
+
+  return result;
+}
 
 }

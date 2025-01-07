@@ -1,4 +1,5 @@
-import { BadRequestException, Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
+
+import { BadRequestException, Body, Controller, Get, Param, ParseIntPipe, Post,Query } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
 import { Transaction } from './entities/transaction.entity';
 @Controller('transaction')
@@ -6,9 +7,11 @@ export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 
   @Get('countTransaction')
-  async countTotalTransactions(): Promise<{ totalTransactions: number }> {
-    const totalTransactions =
-      await this.transactionService.countTotalTransactions();
+  async countTotalTransactions(
+    @Query('userId') userId: string,
+    @Query('role') role: string
+  ): Promise<{ totalTransactions: number }> {
+    const totalTransactions = await this.transactionService.countTotalTransactions(userId, role);
     return { totalTransactions };
   }
 
