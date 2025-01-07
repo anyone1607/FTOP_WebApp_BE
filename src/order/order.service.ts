@@ -2,12 +2,17 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Order } from './entities/order.entity';
-
+import { User } from '../user/entities/user.entity';
+import { Store } from '../store/entities/store.entity';
 @Injectable()
 export class OrderService {
   constructor(
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
+    @InjectRepository(Store)
+    private readonly storeRepo: Repository<Store>,
   ) {}
 
   async countTotalOrders(): Promise<number> {
@@ -17,11 +22,12 @@ export class OrderService {
   }
 
   async countTotalPriceOrder(): Promise<number> {
-    const result = await this.orderRepository.createQueryBuilder('order')
+    const result = await this.orderRepository
+      .createQueryBuilder('order')
       .select('SUM(order.totalPrice)', 'totalPrice')
       .where('order.orderStatus = :orderStatus', { orderStatus: true })
       .getRawOne();
-  
+
     return parseFloat(result.totalPrice || '0');
   }
 
@@ -73,29 +79,80 @@ export class OrderService {
     });
   }
 
-  // api so luong don hang ban duoc cua tung store theo ngay thang nam
-  // async getOrderCountByStore(filterType: 'day' | 'month' | 'year', filterValue: string): Promise<any> {
-  //   const queryBuilder = this.orderRepository
-  //   .createQueryBuilder('order')
-  //   .select('store.storeId', 'storeId')
-  //   .addSelect('store.storeName', 'storeName')
-  //   .addSelect('COUNT(order.orderId)', 'orderCount')
-  //   .innerJoin('order.store', 'store')
-  //   .groupBy('store.storeId')
-  //   .addGroupBy('store.storeName');
-  //   console.log(queryBuilder);
+  async getStoreStats(
+    storeId: number,
+    month: number | null,
+    year: number,
+  ): Promise<{
+    totalOrders: number;
+    totalRevenue: number;
+    totalDiscount: number;
+  }> {
+    const queryBuilder = this.orderRepository
+      .createQueryBuilder('order')
+      .select('COUNT(order.orderId)', 'totalOrders')
+      .addSelect('SUM(order.totalPrice)', 'totalRevenue')
+      .where('order.storeId = :storeId', { storeId })
+      .andWhere('YEAR(order.orderDate) = :year', { year })
+      .andWhere('order.orderStatus = :orderStatus', { orderStatus: true })
+      .andWhere('order.isCashedOut = :isCashedOut', { isCashedOut: false });
 
-  //   if(filterType === 'day') {
-  //     queryBuilder.where('DATE(order.orderDate) = :filterValue', {filterValue});
-  //   }else if(filterType === 'month'){
-  //     queryBuilder.where('MONTH(order.orderDate) = :month AND YEAR(order.orderDate) = :year', {
-  //       month: filterValue.split('-')[1],
-  //       year: filterValue.split('-')[0],
-  //     });
-  //   }else if(filterType === 'year') {
-  //     queryBuilder.where('YEAR(order.orderDate) = :filterValue', { filterValue });
-  //   }
-  //   return await queryBuilder.getRawMany();
-  // }
-  
+    if (month !== null) {
+      queryBuilder.andWhere('MONTH(order.orderDate) = :month', { month });
+    }
+
+    const result = await queryBuilder.getRawOne();
+    const totalOrders = Number(result.totalOrders) || 0;
+    const totalRevenue = parseFloat(result.totalRevenue) || 0;
+    const totalDiscount = totalRevenue * 0.1;
+
+    return {
+      totalOrders,
+      totalRevenue,
+      totalDiscount,
+    };
+  }
+
+  async cashOutMonth(storeId: number, month: number, year: number) {
+    const { totalRevenue, totalDiscount } = await this.getStoreStats(
+      storeId,
+      month,
+      year,
+    );
+    const store = await this.storeRepo.findOne({
+      where: { storeId },
+      relations: ['user'],
+    });
+    if (!store || !store.user) {
+      throw new NotFoundException('Store hoặc User (chủ store) không tồn tại');
+    }
+    const user68 = await this.userRepo.findOne({ where: { id: 68 } });
+    if (!user68) {
+      throw new NotFoundException('User #68 không tồn tại');
+    }
+    if (store.user.walletBalance < totalDiscount) {
+      throw new Error('Chủ store không đủ tiền để chuyển');
+    }
+    store.user.walletBalance -= totalDiscount;
+    user68.walletBalance += totalDiscount;
+    await this.userRepo.save([store.user, user68]);
+    await this.orderRepository
+      .createQueryBuilder()
+      .update(Order)
+      .set({ isCashedOut: true })
+      .where('storeId = :storeId', { storeId })
+      .andWhere('MONTH(orderDate) = :month', { month })
+      .andWhere('YEAR(orderDate) = :year', { year })
+      .andWhere('isCashedOut = :cashedOut', { cashedOut: false })
+      .andWhere('orderStatus = :status', { status: true })
+      .execute();
+
+    return {
+      message: 'Cash out success',
+      totalRevenue,
+      discount: totalDiscount,
+      walletBalanceStoreOwner: store.user.walletBalance,
+      walletBalanceUser68: user68.walletBalance,
+    };
+  }
 }

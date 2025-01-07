@@ -27,7 +27,9 @@ export class StoreService {
   // }
 
   async findAll(): Promise<any> {
-    const stores = await this.storeRepository.find();
+    const stores = await this.storeRepository.find({
+      relations: ['user'],
+    });
     const labels = this.getLast6Months();
 
     const result = await Promise.all(

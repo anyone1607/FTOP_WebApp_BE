@@ -34,5 +34,8 @@ export class Order {
 
   @Column({ default: false })
   isDeleted: boolean;
+
+  @Column({ default: false })
+  isCashedOut: boolean;
   
 }

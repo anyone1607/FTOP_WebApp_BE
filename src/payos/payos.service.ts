@@ -197,7 +197,7 @@ export class PayosService {
     if (owner.walletBalance < amount) {
       errors.push('Số dư không đủ để thực hiện giao dịch');
     }
-    if (owner.role !== 'owner') {
+    if (owner.role !== 'owner' && owner.role !== 'student') {
       errors.push('Người dùng không có quyền rút tiền');
     }
 
