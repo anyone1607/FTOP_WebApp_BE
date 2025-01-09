@@ -112,7 +112,7 @@ export class OrderService {
       totalDiscount,
     };
   }
-
+  // Thay user 68 bằng id của User admin trong db
   async cashOutMonth(storeId: number, month: number, year: number) {
     const { totalRevenue, totalDiscount } = await this.getStoreStats(
       storeId,
