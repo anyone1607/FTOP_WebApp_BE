@@ -267,13 +267,13 @@ return { income, expense, balance };
         }
 
         // 3. Lấy ownerId từ Store
-        if (!store.owner) {
+        if (!store.user) {
           console.error(`Store with ID ${storeId} does not have an owner`);
           throw new NotFoundException(
             `Store with ID ${storeId} does not have an owner`,
           );
         }
-        const receiveUserId = store.owner.id;
+        const receiveUserId = store.user.id;
 
         // 4. Kiểm tra Voucher (nếu có)
         let voucher = null;
@@ -345,11 +345,11 @@ return { income, expense, balance };
 
         user.walletBalance =
           Number(user.walletBalance) - Number(order.totalPrice);
-        store.owner.walletBalance =
-          Number(store.owner.walletBalance) + Number(order.totalPrice);
+        store.user.walletBalance =
+          Number(store.user.walletBalance) + Number(order.totalPrice);
 
         await transactionalEntityManager.save(user);
-        await transactionalEntityManager.save(store.owner);
+        await transactionalEntityManager.save(store.user);
 
         // 9. Trả về kết quả
         return {

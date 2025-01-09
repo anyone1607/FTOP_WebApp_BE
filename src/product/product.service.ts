@@ -26,7 +26,7 @@ export class ProductService {
     async getProducts(userId: number, role: string): Promise<Product[]> {
       if (role === 'owner') {
         return this.productRepository.find({
-          where: { isDeleted: false, store: { ownerId: userId } },
+          where: { isDeleted: false, store: { user: { id: userId } } },
           relations: ['category', 'store'],
         });
       } else {

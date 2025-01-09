@@ -98,7 +98,7 @@ export class VoucherService {
   async findAll(userId: number, role: string): Promise<Voucher[]> {
     if (role === 'owner') {
       return this.voucherRepository.find({
-        where: { isDeleted: false, store: { ownerId: userId } },
+        where: { isDeleted: false, store: { user: { id: userId } } },
         relations: ['store'],
       });
     } else {

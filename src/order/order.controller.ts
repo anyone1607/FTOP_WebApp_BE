@@ -5,6 +5,13 @@ import { Order } from './entities/order.entity';
 export class OrderController {
   constructor(private readonly orderService: OrderService) { }
 
+
+  @Get('uncashed-out-amount')
+  async getUnCashedOutAmount(@Query('userId') userId: number): Promise<{ amount: number }> {
+    const amount = await this.orderService.getUnCashedOutAmount(userId);
+    return { amount };
+  }
+  
   @Get('countOrder')
 async countTotalOrders(
   @Query('userId') userId: string,
@@ -48,14 +55,14 @@ async countTotalPriceOrder(
     );
   }
 
-  @Get('stats/:storeId')
-  async getStoreStats(
-    @Param('storeId') storeId: number,
-    @Query('month') month: number,
-    @Query('year') year: number,
-  ): Promise<{ totalOrders: number; totalRevenue: number }> {
-    return this.orderService.getStoreStats(storeId, month, year);
-  }
+  // @Get('stats/:storeId')
+  // async getStoreStats(
+  //   @Param('storeId') storeId: number,
+  //   @Query('month') month: number,
+  //   @Query('year') year: number,
+  // ): Promise<{ totalOrders: number; totalRevenue: number }> {
+  //   return this.orderService.getStoreStats(storeId, month, year);
+  // }
 
   @Post('create')
   async createOrder(
@@ -112,4 +119,6 @@ async countTotalPriceOrder(
     const result = await this.orderService.cashOutMonth(storeId, month, year);
     return result;
   }
+
+  
 }

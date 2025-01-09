@@ -29,7 +29,7 @@ export class OrderService {
       const ownerId = parseInt(userId, 10);
       return await this.orderRepository.createQueryBuilder('order')
         .innerJoin('order.store', 'store')
-        .where('store.ownerId = :ownerId', { ownerId })
+        .where('store.userId = :userId', { ownerId })
         .andWhere('order.orderStatus = :orderStatus', { orderStatus: true })
         .getCount();
     }
@@ -57,20 +57,20 @@ export class OrderService {
   //     totalRevenue: parseFloat(result.totalRevenue) || 0,
   //   };
   // }
-  // async countTotalPriceOrder(userId: string, role: string): Promise<number> {
-  //   const queryBuilder = this.orderRepository.createQueryBuilder('order')
-  //     .select('SUM(order.totalPrice)', 'totalPrice')
-  //     .where('order.orderStatus = :orderStatus', { orderStatus: true });
+  async countTotalPriceOrder(userId: string, role: string): Promise<number> {
+    const queryBuilder = this.orderRepository.createQueryBuilder('order')
+      .select('SUM(order.totalPrice)', 'totalPrice')
+      .where('order.orderStatus = :orderStatus', { orderStatus: true });
   
-  //   if (role === 'owner') {
-  //     const ownerId = parseInt(userId, 10);
-  //     queryBuilder.innerJoin('order.store', 'store')
-  //       .andWhere('store.ownerId = :ownerId', { ownerId });
-  //   }
+    if (role === 'owner') {
+      const ownerId = parseInt(userId, 10);
+      queryBuilder.innerJoin('order.store', 'store')
+        .andWhere('store.userId = :userId', { userId: ownerId  });
+    }
   
-  //   const result = await queryBuilder.getRawOne();
-  //   return parseFloat(result.totalPrice || '0');
-  // }
+    const result = await queryBuilder.getRawOne();
+    return parseFloat(result.totalPrice || '0');
+  }
 
 
 
@@ -84,7 +84,7 @@ export class OrderService {
     if (role === 'owner') {
       const ownerId = parseInt(userId, 10); // Chuyển đổi userId từ string sang number
       return await this.orderRepository.find({
-        where: { store: { ownerId: ownerId }, isDeleted: false },
+        where: { store: { user: { id: ownerId } }, isDeleted: false },
         relations: ['user', 'store', 'voucher', 'orderItems'],
       });
     }
@@ -182,7 +182,7 @@ export class OrderService {
     if (!store || !store.user) {
       throw new NotFoundException('Store hoặc User (chủ store) không tồn tại');
     }
-    const user68 = await this.userRepo.findOne({ where: { id: 68 } });
+    const user68 = await this.userRepo.findOne({ where: { id: 30 } });
     if (!user68) {
       throw new NotFoundException('User #68 không tồn tại');
     }
@@ -327,5 +327,17 @@ export class OrderService {
   
       return savedOrder;
     });
+  }
+  async getUnCashedOutAmount(userId: number): Promise<number> {
+    const result = await this.orderRepository
+      .createQueryBuilder('order')
+      .select('SUM(order.totalPrice * 0.1)', 'totalDiscount')
+      .innerJoin('order.store', 'store')
+      .where('store.userId  = :userId ', {  userId })
+      .andWhere('order.orderStatus = :orderStatus', { orderStatus: true })
+      .andWhere('order.isCashedOut = :isCashedOut', { isCashedOut: false })
+      .getRawOne();
+
+    return parseFloat(result.totalDiscount) || 0;
   }
 }

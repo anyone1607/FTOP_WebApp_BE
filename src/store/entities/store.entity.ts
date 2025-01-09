@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn,ManyToOne } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn, ManyToOne } from 'typeorm';
 import { Voucher } from '../../voucher/entities/voucher.entity';
 import { Order } from '../../order/entities/order.entity';
 import { User } from '../../user/entities/user.entity';
@@ -17,17 +17,14 @@ export class Store {
   storePhone: number;
 
 
-  @Column()
-  ownerId: number;  // Thêm cột 'ownerId' làm khóa ngoại
 
-  
   // @OneToOne(() => User, user => user.store)
   // @JoinColumn({ name: 'ownerId' })
   // user: User;
 
-@OneToOne(() => User, (user) => user.store)
-  @JoinColumn({ name: 'ownerId' })
-  owner: User;
+  @OneToOne(() => User, (user) => user.store)
+  @JoinColumn({ name: 'userId' })
+  user: User;
 
   @Column({ nullable: false })
   status: boolean;

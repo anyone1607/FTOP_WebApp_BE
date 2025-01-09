@@ -40,7 +40,7 @@ export class StoreService {
 
   async findAll(): Promise<any> {
     const stores = await this.storeRepository.find({
-      relations: ['vouchers','owner'], // Lấy thông tin owner
+      relations: ['vouchers','user'], // Lấy thông tin owner
     });
     const labels = this.getLast6Months();
 
@@ -102,7 +102,7 @@ export class StoreService {
     if (storeDto.storeName) updateData.storeName = storeDto.storeName;
     if (storeDto.storeAddress) updateData.storeAddress = storeDto.storeAddress;
     if (storeDto.storePhone) updateData.storePhone = storeDto.storePhone;
-    if (storeDto.ownerId) updateData.ownerId = storeDto.ownerId;
+    if (storeDto.user) updateData.user = storeDto.user;
     if (storeDto.status !== undefined) {
       updateData.status = typeof storeDto.status === 'boolean' ? storeDto.status : storeDto.status === '1' || storeDto.status === 1;
     }
@@ -181,7 +181,7 @@ export class StoreService {
   
     if (role === 'owner') {
       const ownerId = parseInt(userId, 10);
-      queryBuilder.andWhere('store.ownerId = :ownerId', { ownerId });
+      queryBuilder.andWhere('store.userId  = :userId ', { userId: ownerId });
     }
 
     queryBuilder.groupBy('store.storeId').addGroupBy('store.storeName');
