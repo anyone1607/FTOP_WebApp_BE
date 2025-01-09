@@ -21,21 +21,6 @@ export class PayosController {
     }
   }
 
-  // bug: withdrawMoney is not defined
-  // @Post('withdraw')
-  // async withdraw(
-  //   @Body() body: { walletUserId: number; amount: number; bankName: string; accountNumber: number }
-  // ) {
-  //   const { walletUserId, amount, bankName, accountNumber } = body;
-
-  //   try {
-  //     const result = await this.payosService.withdrawMoney(walletUserId, amount, bankName, accountNumber);
-  //     return result;
-  //   } catch (error) {
-  //     console.error('Error during withdrawal:', error);
-  //     throw new Error('Unable to withdraw funds. Please try again later.');
-  //   }
-  // }
   // https://9f69-118-68-122-42.ngrok-free.app/api/payos/receive-hook
   @Post('receive-hook')
   async handleWebhook(@Body() body: any): Promise<void> {

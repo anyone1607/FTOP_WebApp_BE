@@ -66,39 +66,6 @@ export class PayosService {
     };
   }
 
-  // rút tiền qua payos (limited) web
-  // async withdrawMoney(walletUserId: number, amount: number, bankName: string, accountNumber: number) {
-  //   const user = await this.userRepository.findOne({
-  //     where: { id: walletUserId },
-  //   });
-
-  //   if (!user) {
-  //     throw new Error('User not found');
-  //   }
-
-  //   if (user.walletBalance < amount) {
-  //     throw new Error('Insufficient funds');
-  //   }
-
-  //   const bankTransfer = this.bankTransferRepository.create({
-  //     walletUserId,
-  //     transferType: false,
-  //     bankName,
-  //     accountNumber,
-  //     transferAmount: amount,
-  //     transferDescription: `Rút tiền từ tài khoản ${walletUserId}`,
-  //     transferDate: new Date(),
-  //     status: false,
-  //   });
-
-  //   await this.bankTransferRepository.save(bankTransfer);
-
-  //   return {
-  //     message: 'Withdrawal request created successfully',
-  //     user,
-  //   };
-  // }
-
   async updateTransactionStatus(transferId: number, status: boolean) {
     const bankTransfer = await this.bankTransferRepository.findOne({
       where: { transferId },
@@ -109,12 +76,15 @@ export class PayosService {
       throw new Error('Transaction not found');
     }
 
+    if (bankTransfer.status === true && status === false) {
+      throw new Error('Cannot reject a successful transaction');
+    }
+
     if (status === true && bankTransfer.status === false) {
       bankTransfer.status = true;
       await this.bankTransferRepository.save(bankTransfer);
 
-      bankTransfer.user.walletBalance =
-        bankTransfer.user.walletBalance + bankTransfer.transferAmount;
+      bankTransfer.user.walletBalance += bankTransfer.transferAmount;
       await this.userRepository.save(bankTransfer.user);
 
       return {
@@ -123,51 +93,18 @@ export class PayosService {
       };
     }
 
-    return { message: 'Transaction already processed or invalid status' };
+    if (status === false && bankTransfer.status === false) {
+      bankTransfer.status = false;
+      await this.bankTransferRepository.save(bankTransfer);
+      return { message: 'Transaction rejected' };
+    }
+
+    return { message: 'No changes made' };
   }
 
   async getAllTransactions() {
     return await this.bankTransferRepository.find({ relations: ['user'] });
   }
-
-  // async withdraw(walletUserId: number, amount: number, bankName: string, accountNumber: number) {
-  //   if(amount < 5000 || amount > 300000000) {
-  //     throw new HttpException('Số tiền rút phải từ 50,000 đến 300,000,000', HttpStatus.BAD_REQUEST);
-  //   }
-  //   const owner = await this.userRepository.findOne({
-  //     where: { id: walletUserId },
-  //   })
-
-  //   if(!owner) {
-  //     throw new HttpException('Người dùng không tồn tại', HttpStatus.NOT_FOUND);
-  //   }
-  //   if(owner.walletBalance < amount) {
-  //     throw new HttpException('Số dư không đủ để thực hiện giao dịch', HttpStatus.BAD_REQUEST);
-  //   }
-  //   if(owner.role !== 'owner') {
-  //     throw new HttpException('Người dùng không có quyền rút tiền', HttpStatus.INTERNAL_SERVER_ERROR);
-  //   }
-
-  //   owner.walletBalance -= amount;
-  //   await this.userRepository.save(owner);
-
-  //   const bankTransfer = this.bankTransferRepository.create({
-  //     walletUserId: owner.id,
-  //     accountNumber: accountNumber ? Number(accountNumber) : null,
-  //     bankName: bankName || null,
-  //     transferType: false,
-  //     transferAmount: amount,
-  //     transferDescription: 'Giao dịch rút tiền từ ví người dùng',
-  //     transferDate: new Date(),
-  //     status: true,
-  //   });
-  //   await this.bankTransferRepository.save(bankTransfer);
-  //   return {
-  //     message: 'Rút tiền thành công',
-  //     balance: owner.walletBalance,
-  //     transaction: bankTransfer
-  //   }
-  // }
 
   async withdraw(
     walletUserId: number,
@@ -217,7 +154,7 @@ export class PayosService {
       bankName: bankName || null,
       transferType: false,
       transferAmount: amount,
-      transferDescription: 'Giao dịch rút tiền từ ví người dùng',
+      transferDescription: 'Rút tiền',
       transferDate: new Date(),
       status: true,
     });
