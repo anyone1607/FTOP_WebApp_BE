@@ -182,7 +182,7 @@ export class OrderService {
     if (!store || !store.user) {
       throw new NotFoundException('Store hoặc User (chủ store) không tồn tại');
     }
-    const user68 = await this.userRepo.findOne({ where: { id: 30 } });
+    const user68 = await this.userRepo.findOne({ where: { id: 41 } });
     if (!user68) {
       throw new NotFoundException('User #68 không tồn tại');
     }
