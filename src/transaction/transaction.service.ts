@@ -52,7 +52,7 @@ export class TransactionService {
       const ownerId = parseInt(userId, 10);
       queryBuilder.innerJoin('transaction.order', 'order')
         .innerJoin('order.store', 'store')
-        .andWhere('store.ownerId = :ownerId', { ownerId });
+        .andWhere('store.userId = :userId', {  userId: ownerId });
     }
   
     return await queryBuilder.getCount();

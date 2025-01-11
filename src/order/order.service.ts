@@ -29,7 +29,7 @@ export class OrderService {
       const ownerId = parseInt(userId, 10);
       return await this.orderRepository.createQueryBuilder('order')
         .innerJoin('order.store', 'store')
-        .where('store.userId = :userId', { ownerId })
+        .where('store.userId = :userId', { userId: ownerId })
         .andWhere('order.orderStatus = :orderStatus', { orderStatus: true })
         .getCount();
     }
@@ -37,26 +37,7 @@ export class OrderService {
       where: { orderStatus: true },
     });
   }
-  // async getStoreStats(storeId: number, month: number | null, year: number): Promise<{ totalOrders: number; totalRevenue: number }> {
-  //   const queryBuilder = this.orderRepository.createQueryBuilder('order')
-  //     .select('COUNT(order.orderId)', 'totalOrders')
-  //     .addSelect('SUM(order.totalPrice)', 'totalRevenue')
-  //     .where('order.storeId = :storeId', { storeId })
-  //     .andWhere('YEAR(order.orderDate) = :year', { year })
-  //     .andWhere('order.orderStatus = :orderStatus', { orderStatus: true });
 
-  //   if (month !== null) {
-  //     queryBuilder.andWhere('MONTH(order.orderDate) = :month', { month });
-  //   } else {
-  //     queryBuilder.andWhere(':month IS NULL');
-  //   }
-
-  //   const result = await queryBuilder.getRawOne();
-  //   return {
-  //     totalOrders: parseInt(result.totalOrders, 10) || 0,
-  //     totalRevenue: parseFloat(result.totalRevenue) || 0,
-  //   };
-  // }
   async countTotalPriceOrder(userId: string, role: string): Promise<number> {
     const queryBuilder = this.orderRepository.createQueryBuilder('order')
       .select('SUM(order.totalPrice)', 'totalPrice')
@@ -73,13 +54,6 @@ export class OrderService {
   }
 
 
-
-  // async findAll(): Promise<Order[]> {
-  //   return await this.orderRepository.find({
-  //     where: { isDeleted: false },
-  //     relations: ['user', 'store', 'voucher', 'orderItems'],
-  //   });
-  // }
   async findAll(userId: string, role: string): Promise<Order[]> {
     if (role === 'owner') {
       const ownerId = parseInt(userId, 10); // Chuyển đổi userId từ string sang number

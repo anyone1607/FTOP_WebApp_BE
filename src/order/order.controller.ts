@@ -1,4 +1,4 @@
-import { Controller, Get, Delete, Param, Query, Body,Post } from '@nestjs/common';
+import { Controller, Get, Delete, Param, Query, Body, Post } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { Order } from './entities/order.entity';
 @Controller('order')
@@ -11,24 +11,24 @@ export class OrderController {
     const amount = await this.orderService.getUnCashedOutAmount(userId);
     return { amount };
   }
-  
-  @Get('countOrder')
-async countTotalOrders(
-  @Query('userId') userId: string,
-  @Query('role') role: string
-): Promise<{ totalOrders: number }> {
-  const totalOrders = await this.orderService.countTotalOrders(userId, role);
-  return { totalOrders };
-}
 
-@Get('countPrice')
-async countTotalPriceOrder(
-  @Query('userId') userId: string,
-  @Query('role') role: string
-): Promise<{ totalPrice: number }> {
-  const totalPrice = await this.orderService.countTotalPriceOrder(userId, role);
-  return { totalPrice };
-}
+  @Get('countOrder')
+  async countTotalOrders(
+    @Query('userId') userId: string,
+    @Query('role') role: string
+  ): Promise<{ totalOrders: number }> {
+    const totalOrders = await this.orderService.countTotalOrders(userId, role);
+    return { totalOrders };
+  }
+
+  @Get('countPrice')
+  async countTotalPriceOrder(
+    @Query('userId') userId: string,
+    @Query('role') role: string
+  ): Promise<{ totalPrice: number }> {
+    const totalPrice = await this.orderService.countTotalPriceOrder(userId, role);
+    return { totalPrice };
+  }
 
   @Post('create-with-items')
   async createOrderWithItems(
@@ -120,5 +120,5 @@ async countTotalPriceOrder(
     return result;
   }
 
-  
+
 }

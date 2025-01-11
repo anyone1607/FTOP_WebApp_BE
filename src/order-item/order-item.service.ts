@@ -33,7 +33,7 @@ async getProductsBySales(userId: string, role: string): Promise<any[]> {
     const ownerId = parseInt(userId, 10);
     queryBuilder.innerJoin('orderItem.order', 'order')
       .innerJoin('order.store', 'store')
-      .where('store.ownerId = :ownerId', { ownerId });
+      .where('store.userId  = :userId', { userId: ownerId });
   }
 
   const salesData = await queryBuilder.getRawMany();

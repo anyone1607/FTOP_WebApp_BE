@@ -30,7 +30,7 @@ export class Transaction {
   @Column({ nullable: false })
   status: boolean;
 
-  @ManyToOne(() => Order, (order) => order.orderId, { nullable: true })
+  @ManyToOne(() => Order, (order) => order.orderId, { nullable: true }) 
   @JoinColumn({ name: 'orderId' })
   order: Order;
 

@@ -29,8 +29,6 @@ export class Store {
   @Column({ nullable: false })
   status: boolean;
 
-
-
   // filed array storeImage
   @Column('json', { nullable: true })
   storeImage: string[];

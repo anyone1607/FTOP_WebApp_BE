@@ -26,7 +26,7 @@ export class UserService {
       const ownerId = parseInt(userId, 10);
       return await this.userRepository.createQueryBuilder('user')
         .innerJoin('user.store', 'store')
-        .where('store.ownerId = :ownerId', { ownerId })
+        .where('store.userId = :userId', { userId: ownerId })
         .getCount();
     }
     return await this.userRepository.count();

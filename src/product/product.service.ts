@@ -10,19 +10,6 @@ export class ProductService {
       @InjectRepository(Product)
       private readonly productRepository: Repository<Product>
     ) {}
-    // async getProducts(): Promise<Product[]> {
-    //   const products = await this.productRepository.find({
-    //     relations: ['category', 'store'],  // Bao gồm các mối quan hệ với Category và Store
-    //   });
-    
-    //   return products.map((product) => {
-    //     return {
-    //       ...product,
-    //       categoryName: product.category?.categoryName, // Lấy tên của category
-    //       storeName: product.store?.storeName, // Lấy tên của store
-    //     };
-    //   });
-    // }
     async getProducts(userId: number, role: string): Promise<Product[]> {
       if (role === 'owner') {
         return this.productRepository.find({
@@ -49,11 +36,7 @@ export class ProductService {
         relations: ['category', 'store'], });
     }
 
-    
-    // async updateProduct(productDto: ProductDto, id: number): Promise<Product> {
-    //   await this.productRepository.update(id, productDto);
-    //   return await this.productRepository.findOne({ where: { productId: id } });
-    // }
+
     async updateProduct(productDto: ProductDto, id: number): Promise<Product> {
       console.log("Product Data for Update:", productDto); // Log dữ liệu được gửi tới service
     
@@ -95,31 +78,7 @@ export class ProductService {
         where: { storeId },
       });
     }
-    // async filterProducts(filter?: string, categoryName?: string, storeName?: string): Promise<Product[]> {
-    //   const queryBuilder = this.productRepository.createQueryBuilder('product')
-    //     .leftJoinAndSelect('product.category', 'category')
-    //     .leftJoinAndSelect('product.store', 'store');
-  
-    //   if (filter) {
-    //     queryBuilder.andWhere('product.productName LIKE :filter', { filter: `%${filter}%` });
-    //   }
-  
-    //   if (categoryName) {
-    //     queryBuilder.andWhere('category.categoryName = :categoryName', { categoryName });
-    //   }
-  
-    //   if (storeName) {
-    //     queryBuilder.andWhere('store.storeName = :storeName', { storeName });
-    //   }
-  
-    //   const products = await queryBuilder.getMany();
-  
-    //   return products.map((product) => ({
-    //     ...product,
-    //     categoryName: product.category?.categoryName,
-    //     storeName: product.store?.storeName,
-    //   }));
-    // }
+
     async filterProducts(filter?: string, categoryName?: string, storeName?: string, userId?: number, role?: string): Promise<Product[]> {
       const queryBuilder = this.productRepository.createQueryBuilder('product')
         .leftJoinAndSelect('product.category', 'category')
@@ -138,7 +97,7 @@ export class ProductService {
       }
   
       if (role === 'store-owner') {
-        queryBuilder.andWhere('store.ownerId = :userId', { userId });
+        queryBuilder.andWhere('store.userId = :userId', { userId });
       }
   
       const products = await queryBuilder.getMany();
