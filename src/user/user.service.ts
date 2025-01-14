@@ -1,6 +1,6 @@
-import { ConflictException, HttpException, Injectable,NotFoundException } from '@nestjs/common';
+import { ConflictException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from '../dto/register-user.dto';
 import { LoginUserDto } from '../dto/login-user.dto';
@@ -19,7 +19,7 @@ export class UserService {
     private readonly configService: ConfigService,
     @InjectRepository(BankTransfer)
     private bankTransferRepository: Repository<BankTransfer>,
-  ) {}
+  ) { }
 
   async countTotalUsers(userId: string, role: string): Promise<number> {
     if (role === 'owner') {
@@ -40,27 +40,27 @@ export class UserService {
   //   return await this.userRepository.find();
   // }
 
-      async findByEmail(email :string){
-        return await this.userRepository.findOne({
-          where:{
-            email,
-          },
-        });
-      }
+  async findByEmail(email: string) {
+    return await this.userRepository.findOne({
+      where: {
+        email,
+      },
+    });
+  }
 
-      async searchUsers(query: string, role: string): Promise<User[]> {
-        const queryBuilder = this.userRepository.createQueryBuilder('user');
-    
-        if (query) {
-          queryBuilder.andWhere('user.email LIKE :query OR user.displayName LIKE :query', { query: `%${query}%` });
-        }
-    
-        if (role) {
-          queryBuilder.andWhere('user.role = :role', { role });
-        }
-    
-        return await queryBuilder.getMany();
-      }
+  async searchUsers(query: string, role: string): Promise<User[]> {
+    const queryBuilder = this.userRepository.createQueryBuilder('user');
+
+    if (query) {
+      queryBuilder.andWhere('user.email LIKE :query OR user.displayName LIKE :query', { query: `%${query}%` });
+    }
+
+    if (role) {
+      queryBuilder.andWhere('user.role = :role', { role });
+    }
+
+    return await queryBuilder.getMany();
+  }
 
 
 
@@ -75,15 +75,15 @@ export class UserService {
 
   //   if (existingUser) {
   //     const errors = [];
-    
+
   //     if (existingUser.email === email) {
   //       errors.push('Email already exists');
   //     }
-    
+
   //     if (existingUser.phoneNumber === phoneNumber) {
   //       errors.push('Phone number already exists');
   //     }
-    
+
   //     if (errors.length > 0) {
   //       throw new ConflictException(errors);
   //     }
@@ -121,9 +121,9 @@ export class UserService {
     const payload = { id: user.id, email: user.email };
     return this.generateToken(payload);
   }
-  
-  
-  
+
+
+
   // async refreshToken(refresh_token: string): Promise<any> {
   //   try {
   //     const verify = await this.jwtService.verify(refresh_token, {
@@ -162,7 +162,7 @@ export class UserService {
   //   );
   //   return { access_token, refresh_token };
   // }
-  
+
 
   // private async hashPassword(password: string): Promise<string> {
   //   const saltOrRounds = 10;
@@ -246,16 +246,16 @@ export class UserService {
   //   const payload = { id: user.id, email: user.email };
   //   return this.generateToken(payload);
   // }
-  
-  
-  
+
+
+
   async refreshToken(refresh_token: string): Promise<any> {
     try {
       const verify = await this.jwtService.verify(refresh_token, { secret: 'refresh_token_secret' });
-      const checkExistToken = await this.userRepository.findOneBy( { email: verify.email, refresh_token } );
-      if(checkExistToken) {
+      const checkExistToken = await this.userRepository.findOneBy({ email: verify.email, refresh_token });
+      if (checkExistToken) {
         return this.generateToken({ id: verify.id, email: verify.email });
-      }else {
+      } else {
         throw new HttpException('Refresh token is not valid', HttpStatus.BAD_REQUEST);
       }
     } catch (error) {
@@ -264,7 +264,7 @@ export class UserService {
     }
   }
 
-  private async generateToken (payload: {id: number, email: string}) {
+  private async generateToken(payload: { id: number, email: string }) {
     const access_token = await this.jwtService.signAsync(payload);
     const refresh_token = await this.jwtService.signAsync(payload, {
       secret: 'refresh_token_secret',
@@ -273,7 +273,7 @@ export class UserService {
     await this.userRepository.update(
       { email: payload.email },
       { refresh_token: refresh_token }
-    ); 
+    );
     return { access_token, refresh_token };
   }
 
@@ -332,7 +332,7 @@ export class UserService {
 
   //   return { message: 'Password reset successfully' };
   // }
-  
+
 
   // api nạp tiền vào ví (android) nạp chay
   // async deposit(depositDto: DepositDto): Promise<User> {
@@ -387,4 +387,20 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
+  async isEmailOrPhoneExists(email: string, phone: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({
+      where: [{ email }, { phoneNumber: phone }],
+    });
+    return !!user;
+  }
+
+  async searchUsersApp(query: string): Promise<User[]> {
+    return this.userRepository.find({
+      where: [
+        { displayName: Like(`%${query}%`) },  // Tìm theo tên
+        { phoneNumber: Like(`%${query}%`) }, // Tìm theo số điện thoại
+      ],
+    });
+
+  }
 }

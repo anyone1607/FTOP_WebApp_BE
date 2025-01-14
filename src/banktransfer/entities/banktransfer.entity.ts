@@ -12,10 +12,10 @@ export class BankTransfer {
   @JoinColumn({ name: 'walletUserId' })  
   user: User;
 
-  @Column({ nullable: true }) // có thể null
-  accountNumber: number;
+    @Column({ nullable: true }) // có thể null
+    accountNumber: number;
 
-  @Column({ length: 50, nullable: true }) // có thể null
+  @Column({ length: 100, nullable: true }) // có thể null
   bankName: string;
 
   @Column({ nullable: false })

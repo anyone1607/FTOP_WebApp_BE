@@ -22,6 +22,17 @@ export class UserController {
     return this.usersService.findOwnersWithoutStore();
   }
 
+  @Get('check-duplicate')
+async checkDuplicate(@Query('email') email: string, @Query('phone') phone: string) {
+  const exists = await this.usersService.isEmailOrPhoneExists(email, phone);
+  return { exists };
+}
+
+@Get('searchapp')
+    async searchUsersApp(@Query('query') query: string): Promise<User[]> {
+        return this.usersService.searchUsersApp(query);
+    }
+
   @Get('countUser')
 async getTotalUsers(
   @Query('userId') userId: string,

@@ -24,7 +24,7 @@ export class User {
   avatar: string;
 
   @Column({ nullable: true })
-  phoneNumber: string;
+  phoneNumber: string;  
 
   @Column()
   role: string;

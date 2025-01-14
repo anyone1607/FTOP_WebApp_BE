@@ -13,6 +13,8 @@ export class VoucherService {
     private readonly voucherRepository: Repository<Voucher>,
   ) { }
 
+
+  
   async validateVoucher(details: VoucherDetails) {
     const voucher = await this.voucherRepository.findOneBy({
       voucherName: details.voucherName,
@@ -22,6 +24,7 @@ export class VoucherService {
     const newVoucher = this.voucherRepository.create(details);
     return this.voucherRepository.save(newVoucher);
   }
+
   async create(voucherData: Partial<Voucher>): Promise<Voucher> {
     const voucher = this.voucherRepository.create(voucherData);
     return await this.voucherRepository.save(voucher);
@@ -139,5 +142,5 @@ export class VoucherService {
   }
 
 
-  
+
 }

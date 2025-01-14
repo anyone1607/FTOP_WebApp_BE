@@ -5,12 +5,12 @@ import { BanktransferService } from './banktransfer.service';
 export class BanktransferController {
   constructor(private readonly bankTransferService: BanktransferService) {}
 
-  @Get(':walletUserId')
+  @Get('info/:walletUserId')
   async getBankTransferInfo(@Param('walletUserId') walletUserId: number) {
     return this.bankTransferService.getBankTransferInfo(walletUserId);
   }
 
-  @Get(':walletUserId')
+  @Get('transfers/:walletUserId')
   async getBankTransfersByUserId(@Param('walletUserId') walletUserId: number) {
     return this.bankTransferService.findTransfersByUserId(walletUserId);
   } 

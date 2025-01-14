@@ -226,13 +226,13 @@ return { income, expense, balance };
 
   async findAllTransactionsForUser(userId: number): Promise<Transaction[]> {
     return this.transactionRepository.createQueryBuilder('transaction')
-      .leftJoinAndSelect('transaction.order', 'order')
-      .leftJoinAndSelect('transaction.receiveUser', 'receiveUser')
-      .leftJoinAndSelect('transaction.transferUser', 'transferUser')
-      .where('transaction.transferUserId = :userId', { userId })
-      .orWhere('transaction.receiveUserId = :userId', { userId })
-      .getMany();
-  }
+        .leftJoinAndSelect('transaction.order', 'order')
+        .leftJoinAndSelect('transaction.receiveUser', 'receiveUser')
+        .leftJoinAndSelect('transaction.transferUser', 'transferUser')
+        .where('transaction.transferUserId = :userId', { userId })
+        .orWhere('transaction.receiveUserId = :userId', { userId })
+        .getMany();
+}
 
   // Add data lên cho order,orderitem và transaction khi đặt hàng
 
