@@ -1,8 +1,8 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn,OneToMany } from 'typeorm';
-import { User } from '../../user/entities/user.entity';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { OrderItem } from '../../order-item/entities/orderItem.entity';
 import { Store } from '../../store/entities/store.entity';
+import { User } from '../../user/entities/user.entity';
 import { Voucher } from '../../voucher/entities/voucher.entity';
-import { OrderItem } from 'src/order-item/entities/orderItem.entity';
 
 @Entity()
 export class Order {

@@ -6,20 +6,21 @@ import {
   Param,
   Post,
   Put,
-  ValidationPipe,
+  Query,
+  UploadedFile,
   UseGuards,
-  Query
+  UseInterceptors,
+  ValidationPipe
 } from '@nestjs/common';
-import { ProductService } from './product.service';
-import { ResponseData } from 'src/global/globalClass';
-import { HttpMessage, HttpStatus } from 'src/global/globalEnum';
-import { Product } from './entities/product.entity';
-import { ProductDto } from 'src/dto/product.dto';
-import { UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { RolesGuard } from 'src/auth/utils/role.guard';
+import { RolesGuard } from '../auth/utils/role.guard';
+import { ProductDto } from '../dto/product.dto';
+import { ResponseData } from '../global/globalClass';
+import { HttpMessage, HttpStatus } from '../global/globalEnum';
+import { Product } from './entities/product.entity';
+import { ProductService } from './product.service';
 // import { Roles } from 'src/auth/utils/roles.decorator';
 
 @UseGuards(RolesGuard)

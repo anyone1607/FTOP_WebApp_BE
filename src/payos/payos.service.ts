@@ -1,11 +1,11 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import PayOS from '@payos/node';
-import { BankTransfer } from '../banktransfer/entities/banktransfer.entity';
-import { User } from '../user/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
-import { HttpStatus } from 'src/global/globalEnum';
+import { InjectRepository } from '@nestjs/typeorm';
+import PayOS from '@payos/node';
+import { Repository } from 'typeorm';
+import { BankTransfer } from '../banktransfer/entities/banktransfer.entity';
+import { HttpStatus } from '../global/globalEnum';
+import { User } from '../user/entities/user.entity';
 @Injectable()
 export class PayosService {
   private payos: any;

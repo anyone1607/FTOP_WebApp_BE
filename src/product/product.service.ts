@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository ,Like } from 'typeorm';
+import { Repository } from 'typeorm';
+import { ProductDto } from '../dto/product.dto';
 import { Product } from './entities/product.entity';
-import { ProductDto } from 'src/dto/product.dto';
 @Injectable()
 export class ProductService {
     
@@ -38,9 +38,10 @@ export class ProductService {
 
 
     async updateProduct(productDto: ProductDto, id: number): Promise<Product> {
+
       console.log("Product Data for Update:", productDto); // Log dữ liệu được gửi tới service
     
-      // Chỉ cập nhật các trường có giá trị
+      //Chỉ cập nhật các trường có giá trị
       const updateData: Partial<ProductDto> = {};
       if (productDto.productName) updateData.productName = productDto.productName;
       if (productDto.productPrice) updateData.productPrice = productDto.productPrice;
@@ -48,9 +49,9 @@ export class ProductService {
       if (productDto.storeId) updateData.storeId = productDto.storeId;
       if (productDto.productImage) updateData.productImage = productDto.productImage;
     
-      console.log("Data to be updated in DB:", updateData); // Log dữ liệu trước khi cập nhật database
+      console.log("Data to be updated in DB:", productDto); // Log dữ liệu trước khi cập nhật database
     
-      await this.productRepository.update(id, updateData);
+      await this.productRepository.update(id, productDto);
     
       const updatedProduct = await this.productRepository.findOne({ where: { productId: id } });
     

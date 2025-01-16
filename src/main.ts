@@ -1,19 +1,20 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import session from 'express-session'; 
-import passport from 'passport'; 
-import { join } from 'path';
 import { ValidationPipe } from '@nestjs/common';
-import * as express from 'express';
 import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import * as express from 'express';
+import session from 'express-session';
+import passport from 'passport';
+import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './http-exception.filter';
-import * as path from 'path';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalFilters(new HttpExceptionFilter());
   const configService = app.get(ConfigService);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true
+  }));
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
   app.useGlobalFilters(new HttpExceptionFilter());

@@ -1,14 +1,14 @@
-import { ConflictException, HttpException, Injectable,NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
-import { CreateUserDto } from '../dto/register-user.dto';
-import { LoginUserDto } from '../dto/login-user.dto';
-import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
-import { HttpStatus } from 'src/global/globalEnum';
+import { ConflictException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
+import { Repository } from 'typeorm';
 import { BankTransfer } from '../banktransfer/entities/banktransfer.entity';
+import { LoginUserDto } from '../dto/login-user.dto';
+import { CreateUserDto } from '../dto/register-user.dto';
+import { HttpStatus } from '../global/globalEnum';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {

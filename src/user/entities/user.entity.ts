@@ -1,14 +1,14 @@
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
-  OneToMany,
- OneToOne,JoinColumn,
   CreateDateColumn,
+  Entity,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn
 } from 'typeorm';
-import { Order } from '../../order/entities/order.entity';
 import { BankTransfer } from '../../banktransfer/entities/banktransfer.entity';
-import {Store} from '../../store/entities/store.entity'
+import { Order } from '../../order/entities/order.entity';
+import { Store } from '../../store/entities/store.entity';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()

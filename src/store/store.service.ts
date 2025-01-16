@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Store } from './entities/store.entity';
-import { Product } from '../product/entities/product.entity';
 import { Order } from '../order/entities/order.entity';
+import { Product } from '../product/entities/product.entity';
+import { Store } from './entities/store.entity';
 
 @Injectable()
 export class StoreService {
@@ -91,7 +91,7 @@ export class StoreService {
     console.log(store);
     return store;
   }
- 
+
   async updateStore(storeDto: Partial<Store>, id: number): Promise<Store> {
     console.log("Store Data for Update:", storeDto); // Log dữ liệu được gửi tới service
     if (typeof storeDto.status === 'string') {
@@ -214,7 +214,7 @@ export class StoreService {
   //   return last6Months;
   // }
 
-  private getLast6Months(): { month: string; year: number }[] {
+  public getLast6Months(): { month: string; year: number }[] {
     const months = [
       'Jan',
       'Feb',
@@ -247,7 +247,7 @@ export class StoreService {
     return last6Months;
   }
 
-  private async getSalesDataByStore(storeId: number): Promise<number[]> {
+  async getSalesDataByStore(storeId: number): Promise<number[]> {
     const labels = this.getLast6Months();
     const salesData = [];
 
@@ -269,7 +269,7 @@ export class StoreService {
     return salesData;
   }
 
-  private async getSalesDataByStore1(storeId: number): Promise<number[]> {
+  async getSalesDataByStore1(storeId: number): Promise<number[]> {
     const labels = this.getLast6Months();
     const salesData = [];
 

@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpException, Post } from '@nestjs/common';
+import { HttpStatus } from '../global/globalEnum';
 import { PayosService } from './payos.service';
-import { HttpStatus } from 'src/global/globalEnum';
 
 @Controller('payos')
 export class PayosController {
